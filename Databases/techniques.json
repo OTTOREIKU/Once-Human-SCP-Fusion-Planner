@@ -1,0 +1,314 @@
+[
+  {
+    "name": "Agni's Emissary",
+    "description": "Rebecca fires 3 fire butterflies to up to 3 nearby enemies, dealing multi-hit Elemental DMG to a single target. Greatly lowers resistance on hit."
+  },
+  {
+    "name": "Animal Expert",
+    "description": "Randomly summons a wolf, bear, or leopard for 18s. They perform melee attacks."
+  },
+  {
+    "name": "Beaver Combo",
+    "description": "Performs a 6-hit combo, each hit dealing P.ATK DMG and knocking back the target."
+  },
+  {
+    "name": "BBQ",
+    "description": "Spews fire toward the target, dealing SP.ATK DMG every 0.5s along the path. Can be used up to 5 times in a row."
+  },
+  {
+    "name": "Blackhole Jet",
+    "description": "Charges up to 2s, then fires a 15m black hole beam that deals 4 hits of damage."
+  },
+  {
+    "name": "Blade Declaration",
+    "description": "Throws a dart at a random unit, dealing P.ATK DMG and marking the target for 15s. Mark: When the marked target's HP drops below 50%, Lethal Rabbit deals more damage to them."
+  },
+  {
+    "name": "Blink",
+    "description": "Instantly teleports behind the target, increasing the next P.ATK DMG dealt."
+  },
+  {
+    "name": "Blink Strike",
+    "description": "Randomly selects a target, teleports to strike them 5 times, each hit dealing P.ATK DMG."
+  },
+  {
+    "name": "Burn Aura",
+    "description": "Activates a Burn Aura with a 6m radius, dealing SP.ATK DMG per second to enemies for 5s."
+  },
+  {
+    "name": "Charging Aura",
+    "description": "Creates a 6m radius aura that restores Psi Energy to allies over 5s."
+  },
+  {
+    "name": "Chrysalis",
+    "description": "Hardens the caster, increasing P.DEF and SP.DEF for 8s."
+  },
+  {
+    "name": "Corrosion Aura",
+    "description": "Activates a 6m radius aura, dealing Physical DMG per second to enemies within range for 10s, while slowing their Movement Speed and increasing skill cooldown."
+  },
+  {
+    "name": "Crude Oil Spill",
+    "description": "Tar Pudding enters an Oil Leak state for 15s, increasing SP.ATK and leaving 2m-radius oil puddles every 3s that last 20s."
+  },
+  {
+    "name": "Cryo Bullet",
+    "description": "Fires an ice spike, dealing SP.ATK DMG."
+  },
+  {
+    "name": "Cyclone",
+    "description": "Generates a mini tornado that moves toward enemies, dealing P.ATK DMG every 0.5s for 10s."
+  },
+  {
+    "name": "Damage Link",
+    "description": "Links to an enemy target for 12s. During this time, damage taken is transferred to the enemy."
+  },
+  {
+    "name": "Deviant Energy Conduit",
+    "description": "Selects an allied Deviation to restore Psi Energy every 0.6s for 3s."
+  },
+  {
+    "name": "Dodge",
+    "description": "Grants immunity to the next incoming damage instances."
+  },
+  {
+    "name": "Electric Bullet",
+    "description": "Fires an electric orb, dealing SP.ATK DMG, with a chance to inflict Power Surge. Power Surge: Increases Shock DMG, stacking up to a certain number of times."
+  },
+  {
+    "name": "Electrical Blast",
+    "description": "Randomly throws electric orbs, dealing SP.ATK DMG, and applies 1 stack of Power Surge. Power Surge: Increases Shock DMG taken by, stacking up to a few times."
+  },
+  {
+    "name": "Elemental Overload",
+    "description": "Increases SP.ATK for 8s."
+  },
+  {
+    "name": "Emergency Shield",
+    "description": "Select an allied unit and grant them a shield based on their Max HP for 8s."
+  },
+  {
+    "name": "Explosive",
+    "description": "Self-destructs after staying near the target for 5s, dealing AoE SP.ATK DMG. Has a chance to trigger when HP drops below 50%."
+  },
+  {
+    "name": "Fate Coin",
+    "description": "Flip a coin and launch Mr. Wish Missile. Heads: deals 30% HP damage to enemies. Tails: deals 15% HP damage to yourself."
+  },
+  {
+    "name": "Flame Bullet",
+    "description": "Launches a fireball, dealing SP.ATK DMG."
+  },
+  {
+    "name": "Flame Impact",
+    "description": "Fires a fan-shaped flame, dealing SP.ATK DMG and inflicting Burn for 6s. Burn deals SP.ATK DMG per second."
+  },
+  {
+    "name": "Flame Jet",
+    "description": "Shoots flames about 10 meters forward, dealing continuous damage to enemies in the path."
+  },
+  {
+    "name": "Flaming Flight",
+    "description": "Charges forward, leaving a burning trail that deals damage and inflicts Burn."
+  },
+  {
+    "name": "Frost Satellite",
+    "description": "Summons five ice crystal turrets that fire after 3s, dealing SP.ATK DMG."
+  },
+  {
+    "name": "Frost Vortex",
+    "description": "Creates a Frost Vortex at the target location, lasting for 5s, dealing SP.ATK DMG per hit to enemies within range."
+  },
+  {
+    "name": "Group Elemental Overload",
+    "description": "Increases nearby allies' SP.ATK DMG for 8s."
+  },
+  {
+    "name": "Group Physical Enhancement",
+    "description": "Increases Physical DMG for all allied units."
+  },
+  {
+    "name": "Healing",
+    "description": "Heals the ally with the lowest HP percentage, restoring HP based on the caster's Attack every 0.5s for 5s."
+  },
+  {
+    "name": "Healing Aura",
+    "description": "Activates a healing aura with a 6m radius, restoring a percentage of Max HP per second."
+  },
+  {
+    "name": "Healing Bullet",
+    "description": "Fires healing energy, healing allies for a percentage of the caster's Attack."
+  },
+  {
+    "name": "Healing Link",
+    "description": "Selects allies within 12m to link and heal through shared damage."
+  },
+  {
+    "name": "Heavy Pressure",
+    "description": "Leaps onto the target's head and slams down, dealing AoE P.ATK DMG and knocking the target back."
+  },
+  {
+    "name": "Ice Crystal Ambush",
+    "description": "Creates an ice crystal under the target, dealing SP.ATK DMG. After a brief delay, the crystal explodes, dealing SP.ATK DMG and knocking back enemies in range."
+  },
+  {
+    "name": "Ice Crystal Barrage",
+    "description": "Summons several Ice Crystals that, after a short delay, fire at a single target, dealing high multi-hit Elemental DMG."
+  },
+  {
+    "name": "Incendiary Bullet",
+    "description": "Fires a large fireball that explodes on impact, dealing SP.ATK DMG in an area."
+  },
+  {
+    "name": "Intimidation",
+    "description": "Intimidates the enemy target, reducing their Physical Defense."
+  },
+  {
+    "name": "Kitty Punch",
+    "description": "Delivers three consecutive punches: the first two deal P.ATK DMG each, followed by a third punch that deals P.ATK DMG and knocks back the target, while reducing the target's Attack for 5s."
+  },
+  {
+    "name": "Lightning",
+    "description": "Calls down lightning at the target location, dealing SP.ATK DMG to enemies in range and applying Power Surge on hit. Power Surge: Increases incoming Shock DMG, stacking multiple times."
+  },
+  {
+    "name": "Lightning Pierce",
+    "description": "Charges forward ignoring collision, dealing SP.ATK DMG to targets in the path."
+  },
+  {
+    "name": "Lucky Light",
+    "description": "Summons two searchlights. Increases Multi-cast limit to 5, with a fixed 40% success rate, lasting 30s."
+  },
+  {
+    "name": "Mesh Traction",
+    "description": "Entangles a target unit for 2.5s, pulling it toward you and dealing P.ATK DMG."
+  },
+  {
+    "name": "Meteor",
+    "description": "Summons a meteor at the target location, dealing SP.ATK DMG. Creates a burning zone that deals SP.ATK DMG every 0.5s."
+  },
+  {
+    "name": "Outer God's Tentacle",
+    "description": "Summons 1 tentacle to attack enemies nearby for a few seconds."
+  },
+  {
+    "name": "Penetrating Charge",
+    "description": "Charges forward ignoring collision, dealing P.ATK DMG to targets in the path."
+  },
+  {
+    "name": "Physical Enhancement",
+    "description": "Increases P.ATK for 8s."
+  },
+  {
+    "name": "Physical Shockwave",
+    "description": "Releases a 90 degree cone-shaped shockwave forward, dealing Physical DMG to enemies up to 15 meters away."
+  },
+  {
+    "name": "Provoke",
+    "description": "Taunts enemies within 12m, increasing the caster's P.DEF and SP.DEF for xs."
+  },
+  {
+    "name": "Psi Bullet",
+    "description": "Fires an energy orb, dealing P.ATK DMG."
+  },
+  {
+    "name": "Psi Ray",
+    "description": "Emits a beam toward the target, dealing P.ATK DMG to enemies in the path every 0.5s."
+  },
+  {
+    "name": "Pulse Orb",
+    "description": "Launches a slow-moving electric orb, dealing SP.ATK DMG to all units in its path."
+  },
+  {
+    "name": "Pulse Ray",
+    "description": "Continuously emits an elemental beam at the target, dealing DMG every 0.05s to enemies in its path. Lasts 5s."
+  },
+  {
+    "name": "Rain Arrow",
+    "description": "Fires three rain arrows, dealing SP.ATK DMG to all enemy units along the path."
+  },
+  {
+    "name": "Rainy Peril",
+    "description": "Generates 8 rain arrows nearby to attack target, each consuming current HP to deal SP.ATK DMG."
+  },
+  {
+    "name": "Rapid Charge",
+    "description": "Restores Psi Energy."
+  },
+  {
+    "name": "Rapid Fire",
+    "description": "Fires 3 Bullets, dealing single-target damage. May repeat 3 or 1 times depending on success/failure."
+  },
+  {
+    "name": "Resist Death",
+    "description": "Triggers when HP is low, recovering lost HP."
+  },
+  {
+    "name": "Resonant Skybound",
+    "description": "Teleports next to the target, dealing P.ATK DMG and knocking them airborne."
+  },
+  {
+    "name": "Rite of Strength",
+    "description": "Sacrifices 10% of current HP to increase P.ATK and SP.ATK DMG for 6s."
+  },
+  {
+    "name": "Rush",
+    "description": "Charges at the target, dealing P.ATK DMG and knocking down the target."
+  },
+  {
+    "name": "Savage Strike",
+    "description": "Performs a melee attack, dealing P.ATK DMG."
+  },
+  {
+    "name": "Self-Healing",
+    "description": "Gain a healing effect, recovering HP over 5s."
+  },
+  {
+    "name": "Self-Recharge",
+    "description": "Restores Psi Energy."
+  },
+  {
+    "name": "Shadow Strike",
+    "description": "Dashes forward and performs a draw slash. A crit instantly refreshes this skill."
+  },
+  {
+    "name": "Shield",
+    "description": "Gains a shield based on Max HP, lasting 8s."
+  },
+  {
+    "name": "Space Twister",
+    "description": "Deals P.ATK DMG per second to enemies within a 6m radius for 5s."
+  },
+  {
+    "name": "Speed Up",
+    "description": "After casting, all general skill cooldowns are reduced by seconds."
+  },
+  {
+    "name": "Super Flammable",
+    "description": "Triggers when HP falls below 30%. When near the target, gradually grows to 3X size and self destructs after 4s, dealing AOE DMG equal to 300% of remaining HP."
+  },
+  {
+    "name": "Sweep",
+    "description": "Performs a melee attack in an area, dealing P.ATK DMG."
+  },
+  {
+    "name": "Void Zone",
+    "description": "Creates an 8-meter radius void field around the caster that drains enemies' HP."
+  },
+  {
+    "name": "Weakspot Sniper",
+    "description": "Marks the target's head, then triggers an explosion dealing single-target damage. On a successful roll, also deals 100% bonus damage and stuns."
+  },
+  {
+    "name": "Whale Invasion",
+    "description": "Summons a ghostly giant whale that leaps out of the water and lands at the target location ahead, dealing SP.ATK DMG to enemies within a 10m radius."
+  },
+  {
+    "name": "Whirlwind Slash",
+    "description": "Performs a melee attack in a wide area, dealing P.ATK DMG."
+  },
+  {
+    "name": "Wild Shot",
+    "description": "Unleashes a barrage of shots in front, dealing multiple instances of Physical DMG to targets in range."
+  }
+]

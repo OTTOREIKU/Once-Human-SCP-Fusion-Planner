@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Once Human SCP: Fusion Planner</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="Styles/styles.css">
+    
+    <script src="Scripts/script.js" defer></script>
+    <script src="Scripts/team.js" defer></script>
+</head>
+<body>
+
+<div id="technique-tooltip"></div>
+
+<div id="dataSyncModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0; color:white;">Database Health Check</h3>
+            <span class="close-modal" onclick="closeDataModal()">✕</span>
+        </div>
+        <div id="dataSyncStatus"></div>
+    </div>
+</div>
+
+<div class="container">
+    
+    <h1 style="text-align:center; color:white; margin-bottom: 20px;">
+        Once Human SCP: <span class="title-break">Fusion Planner</span>
+    </h1>
+
+    <div class="header-actions">
+        <button class="secondary" onclick="toggleArenaShops()" id="btnArenaShops">Arena Shops</button>
+        <button class="secondary" onclick="toggleTechniquesLibrary()" id="btnTechniquesLib">Techniques Library</button>
+        <button class="secondary" onclick="toggleLibrary()" id="btnLib">Traits Library</button>
+        
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn-sq" onclick="openDataModal()" title="Database Info">i</button>
+            <a href="https://github.com/OTTOREIKU/Once-Human-Fusion-Planner" target="_blank" class="btn-link btn-sq" style="padding:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <div id="arenaShops" class="tool-panel hidden" style="border-top-color: var(--success);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+            <h3 style="margin:0;">Arena Shops</h3>
+            <div id="shop-filters" style="display:flex; gap:5px;">
+                <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
+                <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
+                <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
+            </div>
+        </div>
+        <div id="arenaShopsContainer" class="arena-grid-layout"></div>
+    </div>
+
+    <div id="techniquesLibrary" class="tool-panel hidden" style="border-top-color: var(--accent);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3>Techniques Library</h3>
+            <input type="text" id="searchTechniquesLib" placeholder="Search techniques..." onkeyup="filterTechniquesLib()" style="max-width: 200px;">
+        </div>
+        <div style="overflow-x:auto; max-height:400px; border:1px solid var(--border);">
+            <table id="techniquesTable">
+                <thead><tr><th width="30%">Name</th><th>Description</th></tr></thead>
+                <tbody id="techniquesBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="traitsLibrary" class="tool-panel hidden" style="border-top-color: var(--purple);">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; margin-bottom:15px;">
+            <h3 style="margin:0;">Traits Library</h3>
+            <input type="text" id="searchTraits" placeholder="Search..." onkeyup="filterTraits()" style="max-width: 200px;">
+        </div>
+        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:15px;">
+            <button class="filter-btn active" onclick="applyFilter('All', this)">All</button>
+            <button class="filter-btn" onclick="applyFilter('Global', this)">Global</button>
+            <button class="filter-btn" onclick="applyFilter('Combat', this)">Combat</button>
+            <button class="filter-btn" onclick="applyFilter('Territory', this)">Territory</button>
+            <button class="filter-btn" onclick="applyFilter('Crafting', this)">Crafting</button>
+            <button class="filter-btn" onclick="applyFilter('Animal', this)">Animal</button>
+            <button class="filter-btn" onclick="applyFilter('Furniture', this)">Furniture</button>
+            <button class="filter-btn" onclick="applyFilter('Variation', this)">Variations</button>
+        </div>
+        <div style="overflow-x:auto; max-height:400px; border:1px solid var(--border);">
+            <table id="traitsTable">
+                <thead><tr><th width="20%">Name</th><th width="15%">Source</th><th width="15%">Category</th><th>Description</th></tr></thead>
+                <tbody id="traitsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tool-panel" style="border-top-color: #ffffff;">
+        <h3>Custom Build Planner</h3>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display:block; font-size:0.85rem; color:#aaa; margin-bottom:5px;">Target Deviation</label>
+            <select id="builderDevSelect"><option>Loading...</option></select>
+        </div>
+        
+        <label style="display:block; font-size:0.85rem; color:#aaa; margin-bottom:5px;">Desired Techniques (Fusion Transfer)</label>
+        <div id="builderCheckboxes" class="checkbox-grid">
+            <span style="color:#666;">Select a deviation above first.</span>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border);">
+            <label style="display:block; font-size:0.85rem; color:#aaa; margin-bottom:5px;">Desired Passive Traits</label>
+            <div style="display:flex; gap:10px;">
+                <div class="input-with-dropdown">
+                    <input type="text" id="traitInput" placeholder="Search traits (e.g. Moonlight)..." onkeyup="filterTraitDropdown()" onfocus="filterTraitDropdown()">
+                    <div id="traitDropdown" class="trait-dropdown"></div>
+                </div>
+                <button onclick="addTrait()" class="secondary">Add</button>
+            </div>
+            <div id="selectedTraits" style="margin-top:10px;"></div>
+        </div>
+        
+        <div style="margin-top: 25px; display:flex; gap:10px;">
+            <button class="btn-neutral" style="flex:2" onclick="generatePlan()">Generate Strategy</button>
+            <button style="flex:1" onclick="resetBuilder()">Reset</button>
+        </div>
+        
+        <div id="builderResults" class="grid-cols"></div>
+
+        <div id="team-ui-area" class="hidden" style="margin-top: 30px; border-top: 1px dashed var(--border); padding-top: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">Squad Builder</h4>
+                <div style="display:flex; gap:5px;">
+                    <button onclick="initTeamMode()" id="btnCreateTeam">Create</button>
+                    <button class="hidden btn-close" onclick="resetTeamData()" id="btnResetTeam" style="border:1px solid #444; border-radius:4px; padding:8px; font-size:0.9rem;">Reset</button>
+                    <button class="hidden btn-close" onclick="deleteTeam()" id="btnDeleteTeam" style="border:1px solid #444; border-radius:4px; padding:8px; font-size:0.9rem;">Delete</button>
+                </div>
+            </div>
+            <div id="team-slots-container" class="team-grid hidden"></div>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); display:flex; gap:10px;">
+            <input type="text" id="shareCodeInput" placeholder="Share Code...">
+            <button onclick="loadShareCode()">Load</button>
+            <button onclick="generateShareCode()">Copy</button>
+            <span id="shareStatus" style="align-self:center; font-size:0.8rem;"></span>
+        </div>
+    </div>
+
+    <div class="tool-panel">
+        <h3>Technique Isolation Checker</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr auto auto; gap:10px; align-items:end;">
+            <div>
+                <label style="font-size:0.8rem; color:#aaa;">Source</label>
+                <select id="sourceDev"><option>Loading...</option></select>
+            </div>
+            <div>
+                <label style="font-size:0.8rem; color:#aaa;">Target</label>
+                <select id="targetTechnique"><option>Select Source first</option></select>
+            </div>
+            <button onclick="findPartners()">Search</button>
+            <button onclick="resetIsolationChecker()">✕</button>
+        </div>
+        <div id="results-area" class="grid-cols"></div>
+    </div>
+
+    <div class="tool-panel">
+        <h3>Technique Search</h3>
+        <div style="display:flex; gap:10px;">
+            <select id="searchTechniqueSelect"><option>Loading...</option></select>
+            <button onclick="searchByTechnique()">Search</button>
+            <button onclick="resetTechniqueSearch()">✕</button>
+        </div>
+        <div id="technique-search-description" style="margin-top:10px; color:#ccc; font-style:italic; padding-left:10px; display:none;"></div>
+        <div id="technique-results-area" class="grid-cols"></div>
+    </div>
+
+    <div class="tool-panel">
+        <h3>Deviation Search</h3>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" id="deviantSearchInput" placeholder="Search name..." onkeyup="filterDeviants()">
+            <button onclick="toggleCompareTool()">Compare</button> 
+            <button onclick="resetDeviantSearch()">✕</button>
+        </div>
+        
+        <div id="deviant-filter-container" style="display:flex; gap:5px; margin-bottom:15px;">
+            <button class="filter-btn btn-all active" onclick="filterDeviants('All', this)">All</button>
+            <button class="filter-btn btn-combat" onclick="filterDeviants('Combat', this)">Combat</button>
+            <button class="filter-btn btn-crafting" onclick="filterDeviants('Crafting', this)">Crafting</button>
+            <button class="filter-btn btn-territory" onclick="filterDeviants('Territory', this)">Territory</button>
+        </div>
+
+        <div id="compare-tool-area" class="hidden" style="background:#252526; padding:15px; border-radius:var(--radius); border:1px dashed var(--border); margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <h4 style="margin:0;">Comparison Tool</h4>
+                <span style="cursor:pointer;" onclick="closeCompareTool()">✕</span>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; align-items:center;">
+                <select id="compareSelectA" onchange="updateComparison()"><option>Select A</option></select>
+                <span style="font-weight:bold; color:var(--accent);">VS</span>
+                <select id="compareSelectB" onchange="updateComparison()"><option>Select B</option></select>
+            </div>
+            <div id="compareResults" class="compare-grid"></div>
+        </div>
+
+        <div id="deviant-results-area" class="grid-cols hidden"></div>
+    </div>
+    
+    <div style="text-align:center; margin-top: 40px; color: #666; font-size: 0.8rem;">
+        OTTOREIKU | V1.74
+    </div>
+</div>
+
+<script>
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const container = document.querySelector('.input-with-dropdown');
+    if (container && !container.contains(e.target)) {
+        const dd = document.getElementById('traitDropdown');
+        if(dd) dd.style.display = 'none';
+    }
+});
+</script>
+
+</body>
+</html>
