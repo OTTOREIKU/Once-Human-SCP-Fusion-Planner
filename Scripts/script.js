@@ -29,7 +29,6 @@ async function init() {
     try {
         let devRes;
         try {
-            // Updated Path: Databases folder
             devRes = await fetch('Databases/deviations.json');
             if (!devRes.ok) throw new Error("Not found");
         } catch (e) {
@@ -348,17 +347,15 @@ function addTrait() {
 }
 function removeTrait(index) { userSelectedTraits.splice(index, 1); renderSelectedTraits(); }
 
+// === RENDER TRAITS (MINI CARD) ===
 function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
         container.innerHTML += `
-            <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">
-                <div class="card-header">
-                    <span class="card-title">${t.name}</span>
-                    <button class="btn-close" onclick="removeTrait(${idx}); event.stopPropagation();">✕</button>
-                </div>
-                <div class="card-body" style="font-size:0.8rem; color:#aaa;">${t.source}</div>
+            <div class="trait-mini-card">
+                <span>${t.name}</span>
+                <span class="remove-btn" onclick="removeTrait(${idx}); event.stopPropagation();">✕</span>
             </div>`;
     });
 }
