@@ -248,6 +248,33 @@ tr:hover { background-color: #2a2a2a; }
 .donor-select-container { margin-top: auto; padding-top: 10px; }
 .donor-select { width: 100%; padding: 6px; background: #1a1a1a; font-size: 0.8rem; border: 1px solid #444; color: white; border-radius: 4px; }
 
+/* === TRAIT MINI CARD (NEW) === */
+.trait-mini-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(191, 90, 242, 0.15); /* Light Purple Background */
+    border: 1px solid var(--purple);
+    border-radius: 4px;
+    padding: 6px 12px;
+    margin: 0 5px 5px 0;
+    font-size: 0.9rem;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.trait-mini-card .remove-btn {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-left: 5px;
+    line-height: 1;
+}
+.trait-mini-card .remove-btn:hover {
+    opacity: 1;
+    color: #fff;
+}
+
 /* === SQUAD BUILDER TAGS === */
 .tag-tech { border-color: rgba(0, 212, 241, 0.3); }
 .tag-tech:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 212, 241, 0.1); }
