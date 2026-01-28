@@ -49,16 +49,15 @@
     <div id="arenaShops" class="tool-panel hidden" style="border-top-color: var(--success);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
             <h3 style="margin:0;">Arena Shops</h3>
-            
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <div id="shop-filters" style="display:flex; gap:5px;">
-                    <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
-                    <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
-                    <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
-                </div>
-                <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 200px;">
-            </div>
+            <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 200px;">
         </div>
+        
+        <div id="shop-filters" style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:15px;">
+            <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
+            <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
+            <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
+        </div>
+        
         <div id="arenaShopsContainer" class="arena-grid-layout"></div>
     </div>
 
