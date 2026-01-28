@@ -35,8 +35,9 @@ async function init() {
             devRes = await fetch('Databases/data.json');
         }
 
+        // Added cache buster to force reload traits.json
         const [traitRes, techRes, shopRes] = await Promise.all([
-            fetch('Databases/traits.json'),
+            fetch('Databases/traits.json?v=' + Date.now()),
             fetch('Databases/techniques.json'),
             fetch('Databases/shops.json')
         ]);
@@ -105,22 +106,20 @@ function selectTraitFromDropdown(name, source) {
     document.getElementById('traitDropdown').style.display = 'none';
 }
 
+/* === RESTORED TOGGLES (Multi-Open Allowed) === */
 function toggleArenaShops() { 
     document.getElementById('arenaShops').classList.toggle('hidden'); 
-    document.getElementById('traitsLibrary').classList.add('hidden');
-    document.getElementById('techniquesLibrary').classList.add('hidden');
+    document.getElementById('btnArenaShops').classList.toggle('active');
 }
 
 function toggleTechniquesLibrary() { 
     document.getElementById('techniquesLibrary').classList.toggle('hidden'); 
-    document.getElementById('traitsLibrary').classList.add('hidden');
-    document.getElementById('arenaShops').classList.add('hidden');
+    document.getElementById('btnTechniquesLib').classList.toggle('active');
 }
 
 function toggleLibrary() { 
     document.getElementById('traitsLibrary').classList.toggle('hidden'); 
-    document.getElementById('arenaShops').classList.add('hidden');
-    document.getElementById('techniquesLibrary').classList.add('hidden');
+    document.getElementById('btnLib').classList.toggle('active');
 }
 
 function applyShopFilter(filter, btn) {
@@ -262,8 +261,9 @@ function buildTraitsTable() {
         let slotBadge = '';
         if (t.slot) {
             let badgeColor = '#444'; 
-            if (t.slot === 4) badgeColor = 'var(--accent)'; 
-            else if (t.slot === 1) badgeColor = '#666'; 
+            // UPDATED: Slot 4 teal removed. Now just using #444 or #666.
+            if (t.slot === 1) badgeColor = '#666'; 
+            
             slotBadge = `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px; margin-left:8px;">S${t.slot}</span>`;
         }
 
@@ -289,7 +289,7 @@ function applyFilter(category, btn) {
 }
 
 function applySlotFilter(slot, btn) {
-    currentSlotFilter = slot;
+    currentSlotFilter = String(slot);
     document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     filterTraits();
@@ -304,7 +304,7 @@ function filterTraits() {
         const slot = row.getAttribute('data-slot'); 
         
         const matchCat = (currentCategoryFilter === 'All') || (cat === currentCategoryFilter); 
-        const matchSlot = (currentSlotFilter === 'All') || (slot == currentSlotFilter);
+        const matchSlot = (currentSlotFilter === 'All') || (String(slot) === currentSlotFilter);
         const matchText = text.includes(val);
 
         if (matchText && matchCat && matchSlot) {
