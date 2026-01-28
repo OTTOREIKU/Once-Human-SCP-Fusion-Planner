@@ -292,6 +292,10 @@
     "description": "Performs a melee attack in an area, dealing P.ATK DMG."
   },
   {
+    "name": "Upper World Protection",
+    "description": "Grants shields equal to max HP to 3 allied Deviations and reflects DMG takens for 10s."
+  },
+  {
     "name": "Void Zone",
     "description": "Creates an 8-meter radius void field around the caster that drains enemies' HP."
   },
