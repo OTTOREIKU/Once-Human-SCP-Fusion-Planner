@@ -49,10 +49,14 @@
     <div id="arenaShops" class="tool-panel hidden" style="border-top-color: var(--success);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
             <h3 style="margin:0;">Arena Shops</h3>
-            <div id="shop-filters" style="display:flex; gap:5px;">
-                <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
-                <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
-                <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
+            
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 150px; padding: 6px;">
+                <div id="shop-filters" style="display:flex; gap:5px;">
+                    <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
+                    <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
+                    <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
+                </div>
             </div>
         </div>
         <div id="arenaShopsContainer" class="arena-grid-layout"></div>
@@ -61,7 +65,7 @@
     <div id="techniquesLibrary" class="tool-panel hidden" style="border-top-color: var(--accent);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3>Techniques Library</h3>
-            <input type="text" id="searchTechniquesLib" placeholder="Search techniques..." onkeyup="filterTechniquesLib()" style="max-width: 200px;">
+            <input type="text" id="searchTechniquesLib" placeholder="Search..." onkeyup="filterTechniquesLib()" style="max-width: 200px;">
         </div>
         <div style="overflow-x:auto; max-height:400px; border:1px solid var(--border);">
             <table id="techniquesTable">
@@ -206,7 +210,7 @@
     </div>
     
     <div style="text-align:center; margin-top: 40px; color: #666; font-size: 0.8rem;">
-        OTTOREIKU | V1.01
+        OTTOREIKU | V1.02
     </div>
 </div>
 
@@ -223,4 +227,3 @@ document.addEventListener('click', function(e) {
 
 </body>
 </html>
-
