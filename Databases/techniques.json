@@ -36,6 +36,10 @@
     "description": "Activates a Burn Aura with a 6m radius, dealing SP.ATK DMG per second to enemies for 5s."
   },
   {
+    "name": "Chain Lightning",
+    "description": "Releases lightning, dealing SP. ATK DMG to hostile targets within an 8-meter radius."
+  },
+  {
     "name": "Charging Aura",
     "description": "Creates a 6m radius aura that restores Psi Energy to allies over 5s."
   },
