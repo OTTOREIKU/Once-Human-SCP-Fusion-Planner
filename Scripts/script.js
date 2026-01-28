@@ -35,7 +35,6 @@ async function init() {
             devRes = await fetch('Databases/data.json');
         }
 
-        // Added cache buster to force reload traits.json
         const [traitRes, techRes, shopRes] = await Promise.all([
             fetch('Databases/traits.json?v=' + Date.now()),
             fetch('Databases/techniques.json'),
@@ -106,7 +105,6 @@ function selectTraitFromDropdown(name, source) {
     document.getElementById('traitDropdown').style.display = 'none';
 }
 
-/* === RESTORED TOGGLES (Multi-Open Allowed) === */
 function toggleArenaShops() { 
     document.getElementById('arenaShops').classList.toggle('hidden'); 
     document.getElementById('btnArenaShops').classList.toggle('active');
@@ -261,7 +259,6 @@ function buildTraitsTable() {
         let slotBadge = '';
         if (t.slot) {
             let badgeColor = '#444'; 
-            // UPDATED: Slot 4 teal removed. Now just using #444 or #666.
             if (t.slot === 1) badgeColor = '#666'; 
             
             slotBadge = `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px; margin-left:8px;">S${t.slot}</span>`;
@@ -421,13 +418,18 @@ function addTrait() {
 }
 function removeTrait(index) { userSelectedTraits.splice(index, 1); renderSelectedTraits(); }
 
+// UPDATED: Render the small cards with the Slot Badge
 function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
+        let badgeColor = '#444';
+        if (t.slot === 1) badgeColor = '#666'; 
+        const slotBadge = t.slot ? `<span style="font-size:0.7em; color:#ddd; background:${badgeColor}; padding:0 4px; border-radius:3px; margin-left:5px;">S${t.slot}</span>` : '';
+
         container.innerHTML += `
             <div class="trait-mini-card">
-                <span>${t.name}</span>
+                <span>${t.name}${slotBadge}</span>
                 <span class="remove-btn" onclick="removeTrait(${idx}); event.stopPropagation();">✕</span>
             </div>`;
     });
@@ -527,12 +529,20 @@ function generatePlan() {
         });
     }
 
+    // UPDATED: Render the result cards with the Slot Badge in the header
     if (userSelectedTraits.length > 0) {
         html += `<div style="grid-column:1/-1; margin:15px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px; color:white; font-weight:bold;">PASSIVE TRAIT SOURCES</div>`;
         userSelectedTraits.forEach(t => {
+            let badgeColor = '#444'; 
+            if (t.slot === 1) badgeColor = '#666'; 
+            const slotBadge = t.slot ? `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px;">S${t.slot}</span>` : '';
+
             html += `
                 <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">
-                    <div class="card-header"><span class="card-title">${t.name}</span></div>
+                    <div class="card-header">
+                        <span class="card-title">${t.name}</span>
+                        ${slotBadge}
+                    </div>
                     <div class="card-body">Source: <strong style="color:white">${t.source}</strong></div>
                 </div>
             `;
