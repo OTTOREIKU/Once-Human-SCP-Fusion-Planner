@@ -8,12 +8,20 @@
     "description": "Randomly summons a wolf, bear, or leopard for 18s. They perform melee attacks."
   },
   {
+    "name": "Arrow Storm",
+    "description": "Summons a rain of arrows lasting 2.3s, dealing 20% SP.ATK DMG every 0.2s to hostile targets within a [7*7] meter area."
+  },
+  {
     "name": "Beaver Combo",
     "description": "Performs a 6-hit combo, each hit dealing P.ATK DMG and knocking back the target."
   },
   {
     "name": "BBQ",
     "description": "Spews fire toward the target, dealing SP.ATK DMG every 0.5s along the path. Can be used up to 5 times in a row."
+  },
+  {
+    "name": "Black Cat's Gaze",
+    "description": "Every 0.5s, drains divinity energy from the target and restores the same amount to you, lasting 10s."
   },
   {
     "name": "Blackhole Jet",
