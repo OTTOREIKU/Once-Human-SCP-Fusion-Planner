@@ -78,7 +78,7 @@
         <h3 style="margin:0 0 15px 0;">Traits Library</h3>
         
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
-            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+            <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
                 <button class="filter-btn active" onclick="applyFilter('All', this)">All</button>
                 <button class="filter-btn" onclick="applyFilter('Global', this)">Global</button>
                 <button class="filter-btn" onclick="applyFilter('Combat', this)">Combat</button>
@@ -87,6 +87,14 @@
                 <button class="filter-btn" onclick="applyFilter('Animal', this)">Animal</button>
                 <button class="filter-btn" onclick="applyFilter('Furniture', this)">Furniture</button>
                 <button class="filter-btn" onclick="applyFilter('Variation', this)">Variations</button>
+                
+                <span style="color:#555; font-size:1.2rem; margin:0 5px; user-select:none; font-weight:300;">|</span>
+
+                <button class="filter-btn slot-btn active" onclick="applySlotFilter('All', this)">Slots</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(1, this)">1</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(2, this)">2</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(3, this)">3</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(4, this)">4</button>
             </div>
             <input type="text" id="searchTraits" placeholder="Search..." onkeyup="filterTraits()" style="max-width: 200px;">
         </div>
@@ -216,7 +224,6 @@
 </div>
 
 <script>
-// Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
     const container = document.querySelector('.input-with-dropdown');
     if (container && !container.contains(e.target)) {
@@ -228,4 +235,3 @@ document.addEventListener('click', function(e) {
 
 </body>
 </html>
-

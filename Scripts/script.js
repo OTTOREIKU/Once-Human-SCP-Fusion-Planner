@@ -6,6 +6,7 @@ let shopDeviationNames = new Set();
 let shopDeviationArena = {}; 
 
 let currentCategoryFilter = 'All';
+let currentSlotFilter = 'All';
 let currentDeviantTypeFilter = 'All';
 let currentShopFilter = 'All';
 let userSelectedTraits = []; 
@@ -18,13 +19,11 @@ const techniqueSelect = document.getElementById('targetTechnique');
 const searchTechniqueSelect = document.getElementById('searchTechniqueSelect');
 const tooltip = document.getElementById('technique-tooltip');
 
-// === HELPER: FIX TOOLTIP TEXT ===
 function safeTooltip(str) {
     if (!str) return "No description";
     return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ");
 }
 
-// === LOAD DATA ===
 async function init() {
     try {
         let devRes;
@@ -36,8 +35,9 @@ async function init() {
             devRes = await fetch('Databases/data.json');
         }
 
+        // Added cache buster to force reload traits.json
         const [traitRes, techRes, shopRes] = await Promise.all([
-            fetch('Databases/traits.json'),
+            fetch('Databases/traits.json?v=' + Date.now()),
             fetch('Databases/techniques.json'),
             fetch('Databases/shops.json')
         ]);
@@ -72,7 +72,6 @@ async function init() {
     }
 }
 
-// === TRAIT SEARCH ===
 function filterTraitDropdown() {
     const input = document.getElementById('traitInput');
     const dropdown = document.getElementById('traitDropdown');
@@ -107,8 +106,21 @@ function selectTraitFromDropdown(name, source) {
     document.getElementById('traitDropdown').style.display = 'none';
 }
 
-// === ARENA SHOPS ===
-function toggleArenaShops() { document.getElementById('arenaShops').classList.toggle('hidden'); document.getElementById('btnArenaShops').classList.toggle('active'); }
+/* === RESTORED TOGGLES (Multi-Open Allowed) === */
+function toggleArenaShops() { 
+    document.getElementById('arenaShops').classList.toggle('hidden'); 
+    document.getElementById('btnArenaShops').classList.toggle('active');
+}
+
+function toggleTechniquesLibrary() { 
+    document.getElementById('techniquesLibrary').classList.toggle('hidden'); 
+    document.getElementById('btnTechniquesLib').classList.toggle('active');
+}
+
+function toggleLibrary() { 
+    document.getElementById('traitsLibrary').classList.toggle('hidden'); 
+    document.getElementById('btnLib').classList.toggle('active');
+}
 
 function applyShopFilter(filter, btn) {
     currentShopFilter = filter;
@@ -151,7 +163,6 @@ function buildArenaShops() {
     `}).join(''); 
 }
 
-// === COMPARISON TOOL ===
 function toggleCompareTool() {
     const area = document.getElementById('compare-tool-area');
     if (area.classList.contains('hidden')) {
@@ -199,7 +210,6 @@ function updateComparison() {
     `;
 }
 
-// === AUDIT ===
 function auditData() { const techDefinitions = new Set(techniquesData.map(t => t.name)); deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) console.warn(`Missing definition: "${tech}"`); }); }); }
 function openDataModal() { const modal = document.getElementById('dataSyncModal'); const statusDiv = document.getElementById('dataSyncStatus'); modal.classList.remove('hidden'); const techDefinitions = new Set(techniquesData.map(t => t.name)); let missingTechCount = 0; let html = ""; deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) { missingTechCount++; html += `<div style="font-size:0.85rem; padding:4px 0; border-bottom:1px dotted #333;"><span style="color:var(--danger)">MISSING:</span> ${tech} (${dev.name})</div>`; } }); }); let missingPsi = 0; let missingPassive = 0; deviations.forEach(dev => { if (!dev.psi || dev.psi === "Data needed") missingPsi++; if (!dev.passive || dev.passive === "Data needed") missingPassive++; }); statusDiv.innerHTML = missingTechCount === 0 ? `<h4 style="color:var(--success);">✅ Core Data Synced Successfully!</h4>` : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; statusDiv.innerHTML += `<div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;"><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div><div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;"><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div></div></div>`; }
 function closeDataModal() { document.getElementById('dataSyncModal').classList.add('hidden'); }
@@ -236,13 +246,74 @@ function hideTooltip() { tooltip.style.display = 'none'; }
 function moveTooltip(e) { tooltip.style.left = (e.pageX + 15) + 'px'; tooltip.style.top = (e.pageY + 15) + 'px'; }
 document.addEventListener('mousemove', (e) => { if (tooltip.style.display === 'block') moveTooltip(e); });
 
-function toggleTechniquesLibrary() { document.getElementById('techniquesLibrary').classList.toggle('hidden'); document.getElementById('btnTechniquesLib').classList.toggle('active'); }
 function buildTechniquesTable() { document.getElementById('techniquesBody').innerHTML = allUniqueTechniques.map(t => { const info = techniquesData.find(x => x.name === t); return `<tr><td style="font-weight:bold; color:#e0e0e0;">${t}</td><td style="color:#aaa;">${info ? info.description : 'Data needed'}</td></tr>`; }).join(''); }
 function filterTechniquesLib() { const val = document.getElementById('searchTechniquesLib').value.toUpperCase(); document.querySelectorAll('#techniquesBody tr').forEach(row => { row.style.display = row.innerText.toUpperCase().includes(val) ? "" : "none"; }); }
-function toggleLibrary() { document.getElementById('traitsLibrary').classList.toggle('hidden'); document.getElementById('btnLib').classList.toggle('active'); }
-function buildTraitsTable() { document.getElementById('traitsBody').innerHTML = traits.map(t => `<tr data-category="${t.category}"><td style="font-weight:bold; color:#e0e0e0;">${t.name}</td><td>${t.source || '-'}</td><td>${t.category}</td><td>${t.description}</td></tr>`).join(''); }
-function applyFilter(category, btn) { currentCategoryFilter = category; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); filterTraits(); }
-function filterTraits() { const val = document.getElementById('searchTraits').value.toUpperCase(); document.querySelectorAll('#traitsBody tr').forEach(row => { const text = row.innerText.toUpperCase(); const cat = row.getAttribute('data-category'); const match = text.includes(val); const catMatch = (currentCategoryFilter === 'All') || (cat === currentCategoryFilter); row.style.display = (match && catMatch) ? "" : "none"; }); }
+
+function buildTraitsTable() { 
+    const tbody = document.getElementById('traitsBody');
+    const sortedTraits = [...traits].sort((a, b) => {
+        const slotA = a.slot || 0;
+        const slotB = b.slot || 0;
+        return slotB - slotA; 
+    });
+
+    tbody.innerHTML = sortedTraits.map(t => {
+        let slotBadge = '';
+        if (t.slot) {
+            let badgeColor = '#444'; 
+            // UPDATED: Slot 4 teal removed. Now just using #444 or #666.
+            if (t.slot === 1) badgeColor = '#666'; 
+            
+            slotBadge = `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px; margin-left:8px;">S${t.slot}</span>`;
+        }
+
+        return `
+        <tr data-category="${t.category}" data-slot="${t.slot || 'none'}">
+            <td style="font-weight:600; color:#e0e0e0;">
+                ${t.name}
+                ${slotBadge}
+            </td>
+            <td>${t.source || '-'}</td>
+            <td>${t.category}</td>
+            <td>${t.description}</td>
+        </tr>
+    `}).join('');
+}
+
+function applyFilter(category, btn) { 
+    currentCategoryFilter = category; 
+    const container = btn.parentElement;
+    container.querySelectorAll('.filter-btn:not(.slot-btn)').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); 
+    filterTraits(); 
+}
+
+function applySlotFilter(slot, btn) {
+    currentSlotFilter = String(slot);
+    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTraits();
+}
+
+function filterTraits() { 
+    const val = document.getElementById('searchTraits').value.toUpperCase(); 
+    
+    document.querySelectorAll('#traitsBody tr').forEach(row => { 
+        const text = row.innerText.toUpperCase(); 
+        const cat = row.getAttribute('data-category'); 
+        const slot = row.getAttribute('data-slot'); 
+        
+        const matchCat = (currentCategoryFilter === 'All') || (cat === currentCategoryFilter); 
+        const matchSlot = (currentSlotFilter === 'All') || (String(slot) === currentSlotFilter);
+        const matchText = text.includes(val);
+
+        if (matchText && matchCat && matchSlot) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    }); 
+}
 
 function filterDeviants(typeFilter, btn) {
     const area = document.getElementById('deviant-results-area'); const input = document.getElementById('deviantSearchInput');
