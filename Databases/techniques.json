@@ -8,12 +8,20 @@
     "description": "Randomly summons a wolf, bear, or leopard for 18s. They perform melee attacks."
   },
   {
+    "name": "Arrow Storm",
+    "description": "Summons a rain of arrows lasting 2.3s, dealing 20% SP.ATK DMG every 0.2s to hostile targets within a [7*7] meter area."
+  },
+  {
     "name": "Beaver Combo",
     "description": "Performs a 6-hit combo, each hit dealing P.ATK DMG and knocking back the target."
   },
   {
     "name": "BBQ",
     "description": "Spews fire toward the target, dealing SP.ATK DMG every 0.5s along the path. Can be used up to 5 times in a row."
+  },
+  {
+    "name": "Black Cat's Gaze",
+    "description": "Every 0.5s, drains divinity energy from the target and restores the same amount to you, lasting 10s."
   },
   {
     "name": "Blackhole Jet",
@@ -34,6 +42,10 @@
   {
     "name": "Burn Aura",
     "description": "Activates a Burn Aura with a 6m radius, dealing SP.ATK DMG per second to enemies for 5s."
+  },
+  {
+    "name": "Chain Lightning",
+    "description": "Releases lightning, dealing SP. ATK DMG to hostile targets within an 8-meter radius."
   },
   {
     "name": "Charging Aura",
@@ -290,6 +302,10 @@
   {
     "name": "Sweep",
     "description": "Performs a melee attack in an area, dealing P.ATK DMG."
+  },
+  {
+    "name": "Upper World Protection",
+    "description": "Grants shields equal to max HP to 3 allied Deviations and reflects DMG takens for 10s."
   },
   {
     "name": "Void Zone",
