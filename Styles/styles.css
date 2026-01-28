@@ -159,7 +159,7 @@ input:focus, select:focus { outline: none; border-color: #666; }
 
 /* Scroll Wrapper for Arena Tables */
 .arena-scroll {
-    max-height: 165px; /* Height for approx 5 items */
+    max-height: 300px; /* Increased to show ~10 items */
     overflow-y: auto;
 }
 /* Scrollbar Styling */
@@ -170,9 +170,9 @@ input:focus, select:focus { outline: none; border-color: #666; }
 
 .arena-table { width: 100%; border-collapse: collapse; }
 .arena-table td { 
-    padding: 4px 10px; /* Reduced Padding */
+    padding: 4px 10px; 
     border-bottom: 1px solid #333; 
-    font-size: 0.75rem; /* Reduced Font Size */
+    font-size: 0.75rem; 
     color: #ccc; 
 }
 .arena-table tr:last-child td { border-bottom: none; }
@@ -248,7 +248,7 @@ tr:hover { background-color: #2a2a2a; }
 .donor-select-container { margin-top: auto; padding-top: 10px; }
 .donor-select { width: 100%; padding: 6px; background: #1a1a1a; font-size: 0.8rem; border: 1px solid #444; color: white; border-radius: 4px; }
 
-/* === TRAIT MINI CARD (NEW) === */
+/* === TRAIT MINI CARD === */
 .trait-mini-card {
     display: inline-flex;
     align-items: center;
