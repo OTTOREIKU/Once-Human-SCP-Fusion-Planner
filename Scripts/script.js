@@ -118,10 +118,13 @@ function applyShopFilter(filter, btn) {
 }
 
 function buildArenaShops() { 
+    const searchText = document.getElementById('searchArenaShop').value.toUpperCase();
+    
     document.getElementById('arenaShopsContainer').innerHTML = shopsData.map(shop => {
         const filteredItems = shop.items.filter(i => {
-            if (currentShopFilter === 'All') return true;
-            return i.type === currentShopFilter;
+            const matchesType = (currentShopFilter === 'All') || (i.type === currentShopFilter);
+            const matchesSearch = i.name.toUpperCase().includes(searchText);
+            return matchesType && matchesSearch;
         });
 
         if (filteredItems.length === 0) return '';
@@ -347,7 +350,6 @@ function addTrait() {
 }
 function removeTrait(index) { userSelectedTraits.splice(index, 1); renderSelectedTraits(); }
 
-// === RENDER TRAITS (MINI CARD) ===
 function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
