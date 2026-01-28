@@ -51,12 +51,12 @@
             <h3 style="margin:0;">Arena Shops</h3>
             
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 150px; padding: 6px;">
                 <div id="shop-filters" style="display:flex; gap:5px;">
                     <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
                     <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
                     <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
                 </div>
+                <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 200px;">
             </div>
         </div>
         <div id="arenaShopsContainer" class="arena-grid-layout"></div>
@@ -210,7 +210,7 @@
     </div>
     
     <div style="text-align:center; margin-top: 40px; color: #666; font-size: 0.8rem;">
-        OTTOREIKU | V1.02
+        OTTOREIKU | V1.77
     </div>
 </div>
 
