@@ -1,99 +1,260 @@
-let deviations = [];
 let traits = [];
-let techniquesData = []; 
-let shopsData = []; 
-let shopDeviationNames = new Set(); 
-let shopDeviationArena = {}; 
-
+let matrix = {};
+let arenaShops = [];
 let currentCategoryFilter = 'All';
-let currentDeviantTypeFilter = 'All';
+let currentSlotFilter = 'All';
 let currentShopFilter = 'All';
-let userSelectedTraits = []; 
-let isListExpanded = false; 
-let allUniqueTechniques = [];
+let currentDeviantFilter = 'All';
 
-const sourceSelect = document.getElementById('sourceDev');
-const builderDevSelect = document.getElementById('builderDevSelect');
-const techniqueSelect = document.getElementById('targetTechnique');
-const searchTechniqueSelect = document.getElementById('searchTechniqueSelect');
-const tooltip = document.getElementById('technique-tooltip');
+document.addEventListener('DOMContentLoaded', () => {
+    Promise.all([
+        fetch('traits.json').then(r => r.json()),
+        fetch('matrix.json').then(r => r.json()),
+        fetch('arena_shops.json').then(r => r.json())
+    ]).then(([tData, mData, sData]) => {
+        traits = tData;
+        matrix = mData;
+        arenaShops = sData;
 
-// === HELPER: FIX TOOLTIP TEXT ===
-function safeTooltip(str) {
-    if (!str) return "No description";
-    return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ");
+        checkDataSync(traits, matrix, arenaShops); 
+
+        buildTraitsTable();
+        populateBuilderSelect();
+        populateTechniquesLib(); 
+        populateSourceSelect(); 
+        populateSearchSelect();
+        buildArenaShops();
+        populateCompareSelects();
+    }).catch(err => console.error("Error loading JSON:", err));
+});
+
+function toggleLibrary() {
+    document.getElementById('traitsLibrary').classList.toggle('hidden');
+    document.getElementById('arenaShops').classList.add('hidden');
+    document.getElementById('techniquesLibrary').classList.add('hidden');
 }
 
-// === LOAD DATA ===
-async function init() {
-    try {
-        let devRes;
-        try {
-            devRes = await fetch('Databases/deviations.json');
-            if (!devRes.ok) throw new Error("Not found");
-        } catch (e) {
-            console.warn("Databases/deviations.json not found, falling back to Databases/data.json");
-            devRes = await fetch('Databases/data.json');
+function toggleArenaShops() {
+    document.getElementById('arenaShops').classList.toggle('hidden');
+    document.getElementById('traitsLibrary').classList.add('hidden');
+    document.getElementById('techniquesLibrary').classList.add('hidden');
+}
+
+function toggleTechniquesLibrary() {
+    document.getElementById('techniquesLibrary').classList.toggle('hidden');
+    document.getElementById('traitsLibrary').classList.add('hidden');
+    document.getElementById('arenaShops').classList.add('hidden');
+}
+
+function buildTraitsTable() {
+    const tbody = document.getElementById('traitsBody');
+    const sortedTraits = [...traits].sort((a, b) => {
+        const slotA = a.slot || 0;
+        const slotB = b.slot || 0;
+        return slotB - slotA; 
+    });
+
+    tbody.innerHTML = sortedTraits.map(t => {
+        let slotBadge = '';
+        if (t.slot) {
+            let badgeColor = '#444'; 
+            if (t.slot === 4) badgeColor = 'var(--accent)'; 
+            else if (t.slot === 1) badgeColor = '#666'; 
+            
+            slotBadge = `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px; margin-left:8px;">S${t.slot}</span>`;
         }
 
-        const [traitRes, techRes, shopRes] = await Promise.all([
-            fetch('Databases/traits.json'),
-            fetch('Databases/techniques.json'),
-            fetch('Databases/shops.json')
-        ]);
+        return `
+        <tr data-category="${t.category}" data-slot="${t.slot || 'none'}">
+            <td style="font-weight:600; color:#e0e0e0;">
+                ${t.name}
+                ${slotBadge}
+            </td>
+            <td>${t.source || '-'}</td>
+            <td>${t.category}</td>
+            <td>${t.description}</td>
+        </tr>
+    `}).join('');
+}
 
-        if (devRes.ok) {
-            deviations = await devRes.json();
-            deviations.sort((a,b) => a.name.localeCompare(b.name));
+function applyFilter(category, btn) {
+    currentCategoryFilter = category;
+    
+    const container = btn.parentElement;
+    container.querySelectorAll('.filter-btn:not(.slot-btn)').forEach(b => b.classList.remove('active'));
+    
+    btn.classList.add('active');
+    filterTraits();
+}
+
+function applySlotFilter(slot, btn) {
+    currentSlotFilter = slot;
+    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTraits();
+}
+
+function filterTraits() {
+    const val = document.getElementById('searchTraits').value.toUpperCase();
+    
+    document.querySelectorAll('#traitsBody tr').forEach(row => {
+        const text = row.innerText.toUpperCase();
+        const cat = row.getAttribute('data-category');
+        const slot = row.getAttribute('data-slot'); 
+        
+        const matchCat = (currentCategoryFilter === 'All') || (cat === currentCategoryFilter);
+        const matchSlot = (currentSlotFilter === 'All') || (slot == currentSlotFilter);
+        const matchText = text.includes(val);
+
+        if (matchText && matchCat && matchSlot) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
         }
-        if (traitRes.ok) {
-            traits = await traitRes.json();
-        }
-        if (techRes.ok) {
-            techniquesData = await techRes.json();
-        }
-        if (shopRes.ok) {
-            shopsData = await shopRes.json();
-            shopsData.forEach(arena => {
-                arena.items.forEach(item => {
-                    if (item.type === "Species Code") {
-                        shopDeviationNames.add(item.name);
-                        shopDeviationArena[item.name] = arena.arena; 
-                    }
-                });
+    });
+}
+
+function populateTechniquesLib() {
+    const tbody = document.getElementById('techniquesBody');
+    let allTechs = [];
+    Object.keys(matrix).forEach(devName => {
+        const dev = matrix[devName];
+        if(dev.techniques) {
+            dev.techniques.forEach(t => {
+                if(!allTechs.find(x => x.name === t.name)) {
+                    allTechs.push(t);
+                }
             });
         }
+    });
+    
+    allTechs.sort((a,b) => a.name.localeCompare(b.name));
 
-        populateUI();
-        renderDeviants(); 
-        auditData(); 
-    } catch (error) {
-        console.error("Error loading data:", error);
-    }
+    tbody.innerHTML = allTechs.map(t => `
+        <tr>
+            <td style="font-weight:bold; color:var(--accent);">${t.name}</td>
+            <td>${t.description}</td>
+        </tr>
+    `).join('');
 }
 
-// === TRAIT SEARCH ===
+function filterTechniquesLib() {
+    const val = document.getElementById('searchTechniquesLib').value.toUpperCase();
+    document.querySelectorAll('#techniquesBody tr').forEach(row => {
+        const text = row.innerText.toUpperCase();
+        row.style.display = text.includes(val) ? "" : "none";
+    });
+}
+
+function buildArenaShops() {
+    const container = document.getElementById('arenaShopsContainer');
+    const searchVal = document.getElementById('searchArenaShop').value.toUpperCase();
+
+    const filtered = arenaShops.filter(item => {
+        const textMatch = item.name.toUpperCase().includes(searchVal) || 
+                          (item.shopName && item.shopName.toUpperCase().includes(searchVal));
+        const typeMatch = (currentShopFilter === 'All') || (item.type === currentShopFilter);
+        return textMatch && typeMatch;
+    });
+
+    const grouped = {};
+    filtered.forEach(item => {
+        const shop = item.shopName || "Misc Shop";
+        if(!grouped[shop]) grouped[shop] = [];
+        grouped[shop].push(item);
+    });
+
+    container.innerHTML = Object.keys(grouped).map(shopName => {
+        const items = grouped[shopName];
+        const rows = items.map(i => {
+            let costColor = i.cost >= 300 ? 'var(--accent)' : 'var(--highlight)';
+            return `
+            <div class="shop-row">
+                <span class="shop-item-name">${i.name}</span>
+                <span class="shop-item-type">${i.type}</span>
+                <span class="shop-item-cost" style="color:${costColor}">${i.cost}</span>
+            </div>
+            `;
+        }).join('');
+
+        return `
+        <div class="shop-card">
+            <div class="shop-header">${shopName}</div>
+            <div class="shop-body">
+                ${rows}
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function applyShopFilter(filterType, btn) {
+    currentShopFilter = filterType;
+    document.querySelectorAll('#shop-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    buildArenaShops();
+}
+
+function populateBuilderSelect() {
+    const sel = document.getElementById('builderDevSelect');
+    sel.innerHTML = '<option value="">Select Deviation...</option>';
+    
+    Object.keys(matrix).sort().forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.text = key;
+        sel.appendChild(opt);
+    });
+    
+    sel.addEventListener('change', onBuilderDevChange);
+}
+
+function onBuilderDevChange() {
+    const devName = document.getElementById('builderDevSelect').value;
+    const container = document.getElementById('builderCheckboxes');
+    
+    if(!devName || !matrix[devName]) {
+        container.innerHTML = '<span style="color:#666;">Select a deviation above first.</span>';
+        return;
+    }
+    
+    const techniques = matrix[devName].techniques || [];
+    if(techniques.length === 0) {
+        container.innerHTML = '<span>No known techniques for this deviation.</span>';
+        return;
+    }
+    
+    container.innerHTML = techniques.map((t, idx) => `
+        <label class="checkbox-item">
+            <input type="checkbox" value="${t.name}" class="tech-cb">
+            <span>${t.name}</span>
+        </label>
+    `).join('');
+}
+
 function filterTraitDropdown() {
     const input = document.getElementById('traitInput');
-    const dropdown = document.getElementById('traitDropdown');
     const filter = input.value.toUpperCase();
+    const dropdown = document.getElementById('traitDropdown');
     
-    dropdown.innerHTML = "";
+    dropdown.innerHTML = '';
     
-    if (filter.length === 0) {
+    if(!filter && document.activeElement !== input) {
         dropdown.style.display = 'none';
         return;
     }
 
     const matches = traits.filter(t => t.name.toUpperCase().includes(filter));
     
-    if (matches.length > 0) {
+    if(matches.length > 0) {
         dropdown.style.display = 'block';
         matches.slice(0, 10).forEach(t => {
             const div = document.createElement('div');
-            div.className = 'trait-option';
-            div.innerHTML = `${t.name} <span>[${t.source}]</span>`;
-            div.onclick = () => selectTraitFromDropdown(t.name, t.source);
+            div.innerText = t.name; 
+            div.onclick = () => {
+                input.value = t.name;
+                dropdown.style.display = 'none';
+            };
             dropdown.appendChild(div);
         });
     } else {
@@ -101,439 +262,361 @@ function filterTraitDropdown() {
     }
 }
 
-function selectTraitFromDropdown(name, source) {
-    const input = document.getElementById('traitInput');
-    input.value = `${name} [${source}]`;
-    document.getElementById('traitDropdown').style.display = 'none';
-}
-
-// === ARENA SHOPS ===
-function toggleArenaShops() { document.getElementById('arenaShops').classList.toggle('hidden'); document.getElementById('btnArenaShops').classList.toggle('active'); }
-
-function applyShopFilter(filter, btn) {
-    currentShopFilter = filter;
-    document.querySelectorAll('#shop-filters .filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    buildArenaShops();
-}
-
-function buildArenaShops() { 
-    const searchText = document.getElementById('searchArenaShop').value.toUpperCase();
-    
-    document.getElementById('arenaShopsContainer').innerHTML = shopsData.map(shop => {
-        const filteredItems = shop.items.filter(i => {
-            const matchesType = (currentShopFilter === 'All') || (i.type === currentShopFilter);
-            const matchesSearch = i.name.toUpperCase().includes(searchText);
-            return matchesType && matchesSearch;
-        });
-
-        if (filteredItems.length === 0) return '';
-
-        return `
-        <div class="arena-card">
-            <div class="arena-header">${shop.arena}</div>
-            <div class="arena-scroll">
-                <table class="arena-table">
-                    ${filteredItems.map(i => {
-                        const isChaos = i.name.includes("Chaos");
-                        const costColor = isChaos ? "var(--chaos-cost)" : "#ffd700";
-                        const displayCost = i.cost !== undefined ? i.cost : '0';
-                        return `
-                        <tr>
-                            <td>${i.name}</td>
-                            <td class="arena-type">${i.type}</td>
-                            <td class="arena-cost" style="color:${costColor};">${displayCost}</td>
-                        </tr>`;
-                    }).join('')}
-                </table>
-            </div>
-        </div>
-    `}).join(''); 
-}
-
-// === COMPARISON TOOL ===
-function toggleCompareTool() {
-    const area = document.getElementById('compare-tool-area');
-    if (area.classList.contains('hidden')) {
-        area.classList.remove('hidden');
-        const selA = document.getElementById('compareSelectA');
-        const selB = document.getElementById('compareSelectB');
-        if (selA.options.length <= 1) {
-            deviations.forEach(dev => {
-                const opt = document.createElement('option');
-                opt.value = dev.name; opt.textContent = dev.name;
-                selA.appendChild(opt);
-                selB.appendChild(opt.cloneNode(true));
-            });
-        }
-    } else {
-        area.classList.add('hidden');
-    }
-}
-function closeCompareTool() { document.getElementById('compare-tool-area').classList.add('hidden'); }
-
-function updateComparison() {
-    const nameA = document.getElementById('compareSelectA').value;
-    const nameB = document.getElementById('compareSelectB').value;
-    const resultArea = document.getElementById('compareResults');
-    if (nameA === "Select Deviation A" || nameB === "Select Deviation B") return;
-    
-    const devA = deviations.find(d => d.name === nameA);
-    const devB = deviations.find(d => d.name === nameB);
-    const skillsA = new Set(devA.techniques);
-    const skillsB = new Set(devB.techniques);
-    const shared = [...skillsA].filter(x => skillsB.has(x)).sort();
-    const uniqueA = [...skillsA].filter(x => !skillsB.has(x)).sort();
-    const uniqueB = [...skillsB].filter(x => !skillsA.has(x)).sort();
-    
-    const renderList = (list, isShared) => list.length ? list.map(s => {
-        const tech = techniquesData.find(t => t.name === s);
-        const desc = tech ? safeTooltip(tech.description) : s;
-        return `<div class="skill-item ${isShared?'skill-shared':''}" onmouseenter="showTooltip(event, '${desc}')" onmouseleave="hideTooltip()">${s}</div>`;
-    }).join('') : '<div style="opacity:0.5; font-size:0.8rem; text-align:center;">None</div>';
-    
-    resultArea.innerHTML = `
-        <div class="compare-col"><div class="col-header">${devA.name}</div>${renderList(uniqueA, false)}</div>
-        <div class="compare-col" style="border-color:var(--accent)"><div class="col-header" style="color:var(--accent)">Shared</div>${renderList(shared, true)}</div>
-        <div class="compare-col"><div class="col-header">${devB.name}</div>${renderList(uniqueB, false)}</div>
-    `;
-}
-
-// === AUDIT ===
-function auditData() { const techDefinitions = new Set(techniquesData.map(t => t.name)); deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) console.warn(`Missing definition: "${tech}"`); }); }); }
-function openDataModal() { const modal = document.getElementById('dataSyncModal'); const statusDiv = document.getElementById('dataSyncStatus'); modal.classList.remove('hidden'); const techDefinitions = new Set(techniquesData.map(t => t.name)); let missingTechCount = 0; let html = ""; deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) { missingTechCount++; html += `<div style="font-size:0.85rem; padding:4px 0; border-bottom:1px dotted #333;"><span style="color:var(--danger)">MISSING:</span> ${tech} (${dev.name})</div>`; } }); }); let missingPsi = 0; let missingPassive = 0; deviations.forEach(dev => { if (!dev.psi || dev.psi === "Data needed") missingPsi++; if (!dev.passive || dev.passive === "Data needed") missingPassive++; }); statusDiv.innerHTML = missingTechCount === 0 ? `<h4 style="color:var(--success);">✅ Core Data Synced Successfully!</h4>` : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; statusDiv.innerHTML += `<div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;"><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div><div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;"><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div></div></div>`; }
-function closeDataModal() { document.getElementById('dataSyncModal').classList.add('hidden'); }
-
-function populateUI() {
-    sourceSelect.innerHTML = ""; builderDevSelect.innerHTML = "";
-    deviations.forEach(dev => {
-        const opt = document.createElement('option');
-        opt.value = dev.name; opt.textContent = dev.name;
-        sourceSelect.appendChild(opt);
-        builderDevSelect.appendChild(opt.cloneNode(true));
-    });
-    const techniqueSet = new Set();
-    deviations.forEach(d => d.techniques.forEach(t => techniqueSet.add(t)));
-    allUniqueTechniques = Array.from(techniqueSet).sort();
-    searchTechniqueSelect.innerHTML = "";
-    allUniqueTechniques.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t; opt.textContent = t; searchTechniqueSelect.appendChild(opt);
-    });
-    buildTechniquesTable(); buildTraitsTable(); buildArenaShops();
-    sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
-    updateTechniques(); updateBuilderTechniques();
-}
-
-function showTooltip(e, input) {
-    if (window.innerWidth <= 768) return;
-    let content = "";
-    const techniqueInfo = techniquesData.find(t => t.name === input);
-    content = techniqueInfo ? techniqueInfo.description : input;
-    if (content) { tooltip.innerHTML = content; tooltip.style.display = 'block'; moveTooltip(e); }
-}
-function hideTooltip() { tooltip.style.display = 'none'; }
-function moveTooltip(e) { tooltip.style.left = (e.pageX + 15) + 'px'; tooltip.style.top = (e.pageY + 15) + 'px'; }
-document.addEventListener('mousemove', (e) => { if (tooltip.style.display === 'block') moveTooltip(e); });
-
-function toggleTechniquesLibrary() { document.getElementById('techniquesLibrary').classList.toggle('hidden'); document.getElementById('btnTechniquesLib').classList.toggle('active'); }
-function buildTechniquesTable() { document.getElementById('techniquesBody').innerHTML = allUniqueTechniques.map(t => { const info = techniquesData.find(x => x.name === t); return `<tr><td style="font-weight:bold; color:#e0e0e0;">${t}</td><td style="color:#aaa;">${info ? info.description : 'Data needed'}</td></tr>`; }).join(''); }
-function filterTechniquesLib() { const val = document.getElementById('searchTechniquesLib').value.toUpperCase(); document.querySelectorAll('#techniquesBody tr').forEach(row => { row.style.display = row.innerText.toUpperCase().includes(val) ? "" : "none"; }); }
-function toggleLibrary() { document.getElementById('traitsLibrary').classList.toggle('hidden'); document.getElementById('btnLib').classList.toggle('active'); }
-function buildTraitsTable() { document.getElementById('traitsBody').innerHTML = traits.map(t => `<tr data-category="${t.category}"><td style="font-weight:bold; color:#e0e0e0;">${t.name}</td><td>${t.source || '-'}</td><td>${t.category}</td><td>${t.description}</td></tr>`).join(''); }
-function applyFilter(category, btn) { currentCategoryFilter = category; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); filterTraits(); }
-function filterTraits() { const val = document.getElementById('searchTraits').value.toUpperCase(); document.querySelectorAll('#traitsBody tr').forEach(row => { const text = row.innerText.toUpperCase(); const cat = row.getAttribute('data-category'); const match = text.includes(val); const catMatch = (currentCategoryFilter === 'All') || (cat === currentCategoryFilter); row.style.display = (match && catMatch) ? "" : "none"; }); }
-
-function filterDeviants(typeFilter, btn) {
-    const area = document.getElementById('deviant-results-area'); const input = document.getElementById('deviantSearchInput');
-    if (typeFilter) {
-        if (currentDeviantTypeFilter === typeFilter && !area.classList.contains('hidden')) { area.classList.add('hidden'); return; }
-        area.classList.remove('hidden'); currentDeviantTypeFilter = typeFilter;
-        document.querySelectorAll('#deviant-filter-container .filter-btn').forEach(b => b.classList.remove('active'));
-        if(btn) btn.classList.add('active');
-    }
-    const query = input.value.toUpperCase(); if (query.length > 0) area.classList.remove('hidden'); renderDeviants();
-}
-function resetDeviantSearch() { document.getElementById('deviantSearchInput').value = ""; currentDeviantTypeFilter = 'All'; document.querySelectorAll('#deviant-filter-container .filter-btn').forEach(b => b.classList.remove('active')); document.querySelector('.btn-all').classList.add('active'); document.getElementById('deviant-results-area').classList.add('hidden'); isListExpanded = false; renderDeviants(); }
-
-function renderDeviants() {
-    const query = document.getElementById('deviantSearchInput').value.toUpperCase();
-    const container = document.getElementById('deviant-results-area');
-    container.innerHTML = "";
-    deviations.forEach(dev => {
-        const nameMatch = dev.name.toUpperCase().includes(query);
-        const typeMatch = (currentDeviantTypeFilter === 'All') || (dev.type === currentDeviantTypeFilter);
-        if (nameMatch && typeMatch) {
-            let status = 'status-neutral';
-            if(dev.type === 'Combat') status = 'status-risky';
-            if(dev.type === 'Territory') status = 'status-perfect';
-            if(dev.type === 'Crafting') status = 'status-crafting'; 
-            
-            let psiDesc = dev.psi || "Data needed";
-            if(psiDesc.includes(':')) psiDesc = psiDesc.split(/:(.*)/s)[1].trim();
-            
-            let passDesc = dev.passive || "Data needed";
-            if(passDesc.includes(':')) passDesc = passDesc.split(/:(.*)/s)[1].trim();
-            
-            const psiStr = (dev.psi && dev.psi !== "Data needed") ? dev.psi.split(':')[0] : "-";
-            const passStr = (dev.passive && dev.passive !== "Data needed") ? dev.passive.split(':')[0] : "-";
-
-            container.innerHTML += `
-                <div class="uni-card ${status}">
-                    <div class="card-header"><span class="card-title">${dev.name}</span><span class="card-badge">${dev.type}</span></div>
-                    <div class="tag-list">${dev.techniques.map(t => {
-                        const techData = techniquesData.find(td => td.name === t);
-                        const techTip = techData ? safeTooltip(techData.description) : t;
-                        return `<span class="uni-tag" onmouseenter="showTooltip(event, '${techTip}')" onmouseleave="hideTooltip()">${t}</span>`;
-                    }).join('')}</div>
-                    <div class="card-divider"></div>
-                    <div class="card-body">
-                        <div style="margin-bottom:4px; cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(psiDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">PSI:</strong> ${psiStr}</div>
-                        <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(passDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Passive:</strong> ${passStr}</div>
-                    </div>
-                </div>`;
-        }
-    });
-}
-
-function resetTechniqueSearch() { searchTechniqueSelect.selectedIndex = 0; document.getElementById('technique-results-area').innerHTML = ""; document.getElementById('technique-search-description').style.display = 'none'; }
-function resetIsolationChecker() { sourceSelect.selectedIndex = 0; updateTechniques(); document.getElementById('results-area').innerHTML = ""; }
-function updateTechniques() { const dev = deviations.find(d => d.name === sourceSelect.value); techniqueSelect.innerHTML = ""; if(dev) dev.techniques.forEach(t => techniqueSelect.innerHTML += `<option>${t}</option>`); }
-
-function findPartners() { 
-    const sName = sourceSelect.value; 
-    const tTechnique = techniqueSelect.value; 
-    const sDev = deviations.find(d => d.name === sName); 
-    const unwanted = sDev.techniques.filter(t => t !== tTechnique); 
-    const resDiv = document.getElementById('results-area'); 
-    resDiv.innerHTML = ""; 
-    const candidates = deviations.filter(d => d.name !== sName && d.techniques.includes(tTechnique))
-        .map(d => ({ name: d.name, overlap: d.techniques.filter(t => unwanted.includes(t)).length, overlapTechniques: d.techniques.filter(t => unwanted.includes(t)) }))
-        .sort((a,b) => a.overlap - b.overlap); 
-    if(candidates.length === 0) return resDiv.innerHTML = "<p>No partners found.</p>"; 
-    candidates.forEach(c => { 
-        let status = 'status-risky'; let label = 'RISKY';
-        if (c.overlap === 0) { status = 'status-perfect'; label = 'PERFECT'; }
-        else if (c.overlap === 1) { status = 'status-good'; label = 'GOOD'; }
-        
-        resDiv.innerHTML += `
-            <div class="uni-card gradient-card ${status}">
-                <div class="card-header">
-                    <span class="card-title">${c.name}</span>
-                    <span class="card-badge">${label}</span>
-                </div>
-                <div class="card-body">Technique Overlap: <strong style="color:white">${c.overlap}</strong></div>
-                ${c.overlap > 0 ? `<div class="card-risk">Risk: ${c.overlapTechniques.join(', ')}</div>` : ''}
-            </div>
-        `;
-    }); 
-}
-
-function searchByTechnique() { const technique = searchTechniqueSelect.value; const area = document.getElementById('technique-results-area'); const descContainer = document.getElementById('technique-search-description'); area.innerHTML = ""; const info = techniquesData.find(t => t.name === technique); descContainer.innerHTML = info ? info.description : "No description."; descContainer.style.display = 'block'; const results = deviations.filter(d => d.techniques.includes(technique)); if (results.length === 0) return area.innerHTML = "<p>No results.</p>"; results.forEach(d => area.innerHTML += `<div class="uni-card status-neutral"><div class="card-header"><span class="card-title">${d.name}</span></div></div>`); }
+let desiredTraits = [];
 
 function addTrait() {
     const input = document.getElementById('traitInput');
     const val = input.value.trim();
     if(!val) return;
-    let traitName = val; let traitSource = "";
-    const match = val.match(/^(.*) \[(.*)\]$/);
-    if (match) { traitName = match[1]; traitSource = match[2]; }
-    let traitInfo;
-    if (traitSource) traitInfo = traits.find(t => t.name === traitName && t.source === traitSource);
-    else traitInfo = traits.find(t => t.name === traitName);
-    if (!traitInfo) { alert("Trait not found in database."); return; }
-    const duplicate = userSelectedTraits.find(t => t.name === traitInfo.name && t.source === traitInfo.source);
-    if(duplicate) { input.value = ""; return; }
-    userSelectedTraits.push(traitInfo);
-    renderSelectedTraits();
-    input.value = "";
+    
+    const tObj = traits.find(t => t.name.toLowerCase() === val.toLowerCase());
+    if(!tObj) {
+        alert("Trait not found in database.");
+        return;
+    }
+    
+    if(!desiredTraits.includes(tObj.name)) {
+        desiredTraits.push(tObj.name);
+        renderSelectedTraits();
+    }
+    input.value = '';
 }
-function removeTrait(index) { userSelectedTraits.splice(index, 1); renderSelectedTraits(); }
 
 function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
-    container.innerHTML = "";
-    userSelectedTraits.forEach((t, idx) => {
-        container.innerHTML += `
-            <div class="trait-mini-card">
-                <span>${t.name}</span>
-                <span class="remove-btn" onclick="removeTrait(${idx}); event.stopPropagation();">✕</span>
-            </div>`;
-    });
+    container.innerHTML = desiredTraits.map(name => `
+        <span class="trait-tag">
+            ${name} <span style="cursor:pointer; margin-left:5px;" onclick="removeTrait('${name}')">×</span>
+        </span>
+    `).join('');
 }
 
-function updateBuilderTechniques() {
-    const dev = deviations.find(d => d.name === builderDevSelect.value);
-    const container = document.getElementById('builderCheckboxes');
-    container.innerHTML = "";
+function removeTrait(name) {
+    desiredTraits = desiredTraits.filter(x => x !== name);
+    renderSelectedTraits();
+}
+
+function resetBuilder() {
+    document.getElementById('builderDevSelect').value = "";
+    document.getElementById('builderCheckboxes').innerHTML = '<span style="color:#666;">Select a deviation above first.</span>';
+    desiredTraits = [];
+    renderSelectedTraits();
     document.getElementById('builderResults').innerHTML = "";
-    if (dev) {
-        [...dev.techniques].sort().forEach(technique => {
-            const techData = techniquesData.find(td => td.name === technique);
-            const desc = techData ? safeTooltip(techData.description) : technique;
-            
-            container.innerHTML += `<div class="checkbox-item" onmouseenter="showTooltip(event, '${desc}')" onmouseleave="hideTooltip()" onclick="document.getElementById('chk_${technique.replace(/[^a-zA-Z0-9]/g,'')}').click()"><input type="checkbox" id="chk_${technique.replace(/[^a-zA-Z0-9]/g,'')}" value="${technique}" onclick="event.stopPropagation()"><label>${technique}</label></div>`;
-        });
-    }
+    document.getElementById('traitInput').value = "";
 }
 
 function generatePlan() {
-    if (typeof isTeamMode !== 'undefined' && isTeamMode) {
-        saveCurrentBuildToSlot(activeTeamSlot);
-        renderTeamSlots(); 
+    const targetDev = document.getElementById('builderDevSelect').value;
+    if(!targetDev) {
+        alert("Please select a target deviation.");
+        return;
+    }
+
+    const checkboxes = document.querySelectorAll('.tech-cb:checked');
+    const desiredTechs = Array.from(checkboxes).map(cb => cb.value);
+
+    let strategyHTML = `<h3>Strategy for ${targetDev}</h3>`;
+    
+    if(desiredTraits.length > 0) {
+        strategyHTML += `<div class="result-box"><h4>Required Traits Sources</h4><ul>`;
+        desiredTraits.forEach(traitName => {
+            const tObj = traits.find(t => t.name === traitName);
+            strategyHTML += `<li><b>${traitName}</b>: Found on <span style="color:var(--highlight)">${tObj ? tObj.source : 'Unknown'}</span></li>`;
+        });
+        strategyHTML += `</ul></div>`;
+    }
+
+    if(desiredTechs.length > 0) {
+        strategyHTML += `<div class="result-box"><h4>Skill Mutagen Sources (Arena)</h4><ul>`;
+        desiredTechs.forEach(tech => {
+            const sources = arenaShops.filter(s => s.name === tech && s.type === 'Skill Mutagen');
+            if(sources.length > 0) {
+                const shopNames = sources.map(s => s.shopName).join(', ');
+                strategyHTML += `<li><b>${tech}</b>: Buyable at ${shopNames}</li>`;
+            } else {
+                strategyHTML += `<li><b>${tech}</b>: Not found in Arena Shops (Check wild drops)</li>`;
+            }
+        });
+        strategyHTML += `</ul></div>`;
+    }
+    
+    document.getElementById('builderResults').innerHTML = strategyHTML;
+}
+
+function populateSourceSelect() {
+    const s1 = document.getElementById('sourceDev');
+    const s2 = document.getElementById('searchTechniqueSelect'); 
+    s1.innerHTML = '<option value="">Select Deviation...</option>';
+    s2.innerHTML = '<option value="">Select Technique...</option>';
+    
+    Object.keys(matrix).sort().forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.text = k;
+        s1.appendChild(opt);
+    });
+
+    let techSet = new Set();
+    Object.values(matrix).forEach(d => {
+        if(d.techniques) d.techniques.forEach(t => techSet.add(t.name));
+    });
+    Array.from(techSet).sort().forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.text = t;
+        s2.appendChild(opt);
+    });
+
+    s1.addEventListener('change', () => {
+        const dev = s1.value;
+        const targetSel = document.getElementById('targetTechnique');
+        targetSel.innerHTML = '';
+        if(!dev || !matrix[dev]) return;
+        
+        const techs = matrix[dev].techniques || [];
+        techs.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.name;
+            opt.text = t.name;
+            targetSel.appendChild(opt);
+        });
+    });
+}
+
+function populateSearchSelect() {
+}
+
+function findPartners() {
+    const sourceName = document.getElementById('sourceDev').value;
+    const targetTech = document.getElementById('targetTechnique').value;
+    
+    if(!sourceName || !targetTech) return;
+    
+    const resDiv = document.getElementById('results-area');
+    resDiv.innerHTML = `<div class="result-box">Looking for partners to isolate <b>${targetTech}</b> from <b>${sourceName}</b>...<br><br>
+    <i>(Logic placeholder: To guarantee isolation, fuse with a partner that has identical technique pool or empty pool?)</i>
+    </div>`;
+}
+
+function resetIsolationChecker() {
+    document.getElementById('sourceDev').value = "";
+    document.getElementById('targetTechnique').innerHTML = "<option>Select Source first</option>";
+    document.getElementById('results-area').innerHTML = "";
+}
+
+function searchByTechnique() {
+    const techName = document.getElementById('searchTechniqueSelect').value;
+    const descDiv = document.getElementById('technique-search-description');
+    const resDiv = document.getElementById('technique-results-area');
+    
+    if(!techName) return;
+
+    let foundDesc = "";
+    Object.values(matrix).some(d => {
+        if(d.techniques) {
+            const t = d.techniques.find(x => x.name === techName);
+            if(t) { foundDesc = t.description; return true; }
+        }
+    });
+    
+    if(foundDesc) {
+        descDiv.innerText = foundDesc;
+        descDiv.style.display = "block";
     } else {
-        const teamUI = document.getElementById('team-ui-area');
-        if (teamUI && teamUI.classList.contains('hidden')) teamUI.classList.remove('hidden');
+        descDiv.style.display = "none";
     }
 
-    const name = builderDevSelect.value;
-    const sourceDev = deviations.find(d => d.name === name);
-    const selected = Array.from(document.querySelectorAll('#builderCheckboxes input:checked')).map(cb => cb.value);
-    const results = document.getElementById('builderResults');
-    
-    if (selected.length === 0 && userSelectedTraits.length === 0) return results.innerHTML = "<p style='color:var(--warning)'>Please select at least one technique or trait.</p>";
-    
-    let html = ``;
-    
-    if (selected.length > 0) {
-        html += `<div style="grid-column:1/-1; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px; color:white; font-weight:bold;">TECHNIQUE DONORS</div>`;
-        selected.forEach((technique, index) => {
-            const unwanted = sourceDev.techniques.filter(t => t !== technique);
-            
-            const candidates = deviations.filter(d => d.name !== name && d.techniques.includes(technique))
-                .map(d => ({ 
-                    name: d.name, 
-                    overlap: d.techniques.filter(t => unwanted.includes(t)).length, 
-                    overlapTechniques: d.techniques.filter(t => unwanted.includes(t)) 
-                }))
-                .sort((a,b) => {
-                    if (a.overlap !== b.overlap) return a.overlap - b.overlap;
-                    const aShop = shopDeviationNames.has(a.name);
-                    const bShop = shopDeviationNames.has(b.name);
-                    if (aShop !== bShop) return aShop ? -1 : 1;
-                    if (aShop && bShop) {
-                        const aChaos = a.name.includes("Chaos");
-                        const bChaos = b.name.includes("Chaos");
-                        if (aChaos !== bChaos) return aChaos ? 1 : -1;
-                    }
-                    return a.name.localeCompare(b.name);
-                });
-            
-            let initClass = 'status-risky';
-            if (candidates.length > 0) {
-                if (candidates[0].overlap === 0) initClass = 'status-perfect';
-                else if (candidates[0].overlap === 1) initClass = 'status-good';
-            }
+    const owners = [];
+    Object.keys(matrix).forEach(devName => {
+        const dev = matrix[devName];
+        if(dev.techniques && dev.techniques.find(t => t.name === techName)) {
+            owners.push(devName);
+        }
+    });
 
-            const techData = techniquesData.find(td => td.name === technique);
-            const techTip = techData ? safeTooltip(techData.description) : technique;
-
-            html += `
-            <div class="uni-card gradient-card donor-card ${initClass}" id="technique-card-${index}">
-                <div class="card-header">
-                    <span class="card-title" onmouseenter="showTooltip(event, '${techTip}')" onmouseleave="hideTooltip()">${technique}</span>
-                    <div style="display:flex; align-items:center;">
-                        <span class="badge-shop" onmouseenter="showTooltip(event, 'Found in Shop')" onmouseleave="hideTooltip()">SHOP</span>
-                        <span class="card-badge badge-dynamic">Calculating...</span>
-                    </div>
-                </div>
-                <div class="card-risk dynamic-risk"></div>
-                
-                <div class="donor-select-container">
-                    <select class="donor-select" onchange="updateDonorCard(this)" style="padding:6px; background:#1a1a1a; font-size:0.8rem;">
-            `;
-            if(candidates.length === 0) html += `<option>No donors found</option>`;
-            else {
-                candidates.forEach(c => {
-                    let label = c.overlap === 0 ? "PERFECT" : (c.overlap === 1 ? "GOOD" : "RISKY");
-                    const junkStr = c.overlap > 0 ? `Risk: ${c.overlapTechniques.join(', ')}` : "";
-                    const isShop = shopDeviationNames.has(c.name);
-                    const arenaName = shopDeviationArena[c.name] || "";
-                    html += `<option value="${c.overlap}" data-label="${label}" data-junk="${junkStr}" data-shop="${isShop}" data-arena="${arenaName}">(${label}) ${c.name} ${isShop ? '[SHOP]' : ''}</option>`;
-                });
-            }
-            html += `</select></div></div>`;
-        });
-    }
-
-    if (userSelectedTraits.length > 0) {
-        html += `<div style="grid-column:1/-1; margin:15px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px; color:white; font-weight:bold;">PASSIVE TRAIT SOURCES</div>`;
-        userSelectedTraits.forEach(t => {
-            html += `
-                <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">
-                    <div class="card-header"><span class="card-title">${t.name}</span></div>
-                    <div class="card-body">Source: <strong style="color:white">${t.source}</strong></div>
-                </div>
-            `;
-        });
-    }
-    
-    results.innerHTML = html;
-    setTimeout(() => { document.querySelectorAll('.donor-select').forEach(sel => updateDonorCard(sel)); }, 10);
+    resDiv.innerHTML = owners.map(name => `
+        <div class="card">
+            <div class="card-title">${name}</div>
+        </div>
+    `).join('');
 }
 
-function updateDonorCard(select) {
-    const card = select.closest('.uni-card');
-    const selectedOption = select.options[select.selectedIndex];
-    const label = selectedOption.getAttribute('data-label');
-    const junk = selectedOption.getAttribute('data-junk');
-    const isShop = selectedOption.getAttribute('data-shop') === "true";
-    const arena = selectedOption.getAttribute('data-arena');
-    
-    const badge = card.querySelector('.badge-dynamic');
-    const shopBadge = card.querySelector('.badge-shop');
-    const riskDiv = card.querySelector('.dynamic-risk');
-    
-    card.classList.remove('status-perfect', 'status-good', 'status-risky', 'status-neutral');
-    
-    badge.textContent = label;
-    riskDiv.textContent = junk;
-
-    if (label === "PERFECT") card.classList.add('status-perfect');
-    else if (label === "GOOD") card.classList.add('status-good');
-    else card.classList.add('status-risky');
-
-    if (isShop) { 
-        shopBadge.style.display = "inline-block"; 
-        shopBadge.onmouseenter = (e) => showTooltip(e, arena);
-        shopBadge.onmouseleave = hideTooltip;
-    } else { 
-        shopBadge.style.display = "none"; 
-        shopBadge.onmouseenter = null;
-    }
+function resetTechniqueSearch() {
+    document.getElementById('searchTechniqueSelect').value = "";
+    document.getElementById('technique-search-description').style.display = "none";
+    document.getElementById('technique-results-area').innerHTML = "";
 }
 
-function resetBuilder(keepTeamMode = false) {
-    builderDevSelect.selectedIndex = 0; updateBuilderTechniques(); userSelectedTraits = [];
-    document.getElementById('traitInput').value = ""; document.getElementById('builderResults').innerHTML = ""; renderSelectedTraits();
-    if (!keepTeamMode && typeof deleteTeam === 'function') deleteTeam();
+function filterDeviants(typeFilter, btn) {
+    if(typeFilter) {
+        currentDeviantFilter = typeFilter;
+        document.querySelectorAll('#deviant-filter-container .filter-btn').forEach(b => b.classList.remove('active'));
+        if(btn) btn.classList.add('active');
+    }
+    
+    const searchVal = document.getElementById('deviantSearchInput').value.toUpperCase();
+    const container = document.getElementById('deviant-results-area');
+    
+    if(!searchVal && currentDeviantFilter === 'All') {
+        container.classList.add('hidden');
+        return;
+    }
+    container.classList.remove('hidden');
+
+    const matches = Object.keys(matrix).filter(name => {
+        const dev = matrix[name];
+        const textMatch = name.toUpperCase().includes(searchVal);
+        const typeMatch = (currentDeviantFilter === 'All') || (dev.type === currentDeviantFilter);
+        return textMatch && typeMatch;
+    });
+
+    container.innerHTML = matches.map(name => {
+        const dev = matrix[name];
+        return `
+        <div class="card">
+            <div class="card-title">${name} <span style="font-size:0.7em; font-weight:normal; float:right;">${dev.type}</span></div>
+            <div style="font-size:0.85rem; color:#ccc; margin-bottom:5px;">${dev.desc || ''}</div>
+            <div class="tech-list">
+                ${(dev.techniques || []).map(t => `<span>${t.name}</span>`).join('')}
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function resetDeviantSearch() {
+    document.getElementById('deviantSearchInput').value = "";
+    filterDeviants('All', document.querySelector('.btn-all'));
+    document.getElementById('deviant-results-area').classList.add('hidden');
+    closeCompareTool();
+}
+
+function toggleCompareTool() {
+    const area = document.getElementById('compare-tool-area');
+    area.classList.toggle('hidden');
+}
+
+function closeCompareTool() {
+    document.getElementById('compare-tool-area').classList.add('hidden');
+}
+
+function populateCompareSelects() {
+    const sA = document.getElementById('compareSelectA');
+    const sB = document.getElementById('compareSelectB');
+    const opts = Object.keys(matrix).sort().map(k => `<option value="${k}">${k}</option>`).join('');
+    sA.innerHTML = '<option value="">Select A</option>' + opts;
+    sB.innerHTML = '<option value="">Select B</option>' + opts;
+}
+
+function updateComparison() {
+    const devA = document.getElementById('compareSelectA').value;
+    const devB = document.getElementById('compareSelectB').value;
+    const res = document.getElementById('compareResults');
+    
+    if(!devA || !devB) {
+        res.innerHTML = "";
+        return;
+    }
+    
+    const dataA = matrix[devA];
+    const dataB = matrix[devB];
+    
+    const techsA = (dataA.techniques || []).map(t => t.name);
+    const techsB = (dataB.techniques || []).map(t => t.name);
+    
+    const shared = techsA.filter(t => techsB.includes(t));
+    const uniqueA = techsA.filter(t => !techsB.includes(t));
+    const uniqueB = techsB.filter(t => !techsA.includes(t));
+    
+    res.innerHTML = `
+        <div style="text-align:center;">
+            <h5>${devA}</h5>
+            <div style="color:var(--highlight); font-size:0.9rem;">${dataA.type}</div>
+            <hr style="border-color:#444;">
+            <div style="font-size:0.85rem; text-align:left;">
+                ${uniqueA.map(t => `<div>+ ${t}</div>`).join('')}
+            </div>
+        </div>
+        <div style="text-align:center; border-left:1px solid #444; border-right:1px solid #444;">
+            <h5>Shared</h5>
+            <div style="font-size:0.85rem; color:var(--success); margin-top:10px;">
+                ${shared.length > 0 ? shared.join('<br>') : '<span style="color:#666;">None</span>'}
+            </div>
+        </div>
+        <div style="text-align:center;">
+            <h5>${devB}</h5>
+            <div style="color:var(--highlight); font-size:0.9rem;">${dataB.type}</div>
+            <hr style="border-color:#444;">
+            <div style="font-size:0.85rem; text-align:left;">
+                ${uniqueB.map(t => `<div>+ ${t}</div>`).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function generateShareCode() {
+    const target = document.getElementById('builderDevSelect').value;
+    if(!target && desiredTraits.length === 0) return;
+    
+    const payload = {
+        t: target,
+        tr: desiredTraits
+    };
+    
+    const jsonStr = JSON.stringify(payload);
+    const b64 = btoa(jsonStr);
+    
+    document.getElementById('shareCodeInput').value = b64;
+    navigator.clipboard.writeText(b64);
+    
+    const stat = document.getElementById('shareStatus');
+    stat.innerText = "Copied!";
+    setTimeout(() => stat.innerText = "", 2000);
 }
 
 function loadShareCode() {
     const code = document.getElementById('shareCodeInput').value.trim();
     if(!code) return;
+    
     try {
-        const payload = JSON.parse(atob(code));
-        if (Array.isArray(payload)) { document.getElementById('team-ui-area').classList.remove('hidden'); teamData = payload; if(typeof initTeamMode==="function"){initTeamMode(true);activeTeamSlot=0;renderTeamSlots();if(teamData[0])restoreBuildFromData(teamData[0]);} } 
-        else { if (typeof isTeamMode !== 'undefined' && isTeamMode) restoreBuildFromData(payload); else restoreBuildFromData(payload); }
-        document.getElementById('shareStatus').textContent = "Loaded!";
-    } catch(e) { alert("Invalid Code"); }
-}
-
-function generateShareCode() {
-    let payload;
-    if (typeof isTeamMode !== 'undefined' && isTeamMode) { saveCurrentBuildToSlot(activeTeamSlot); payload = teamData; } 
-    else {
-        const target = builderDevSelect.value;
-        const skills = Array.from(document.querySelectorAll('#builderCheckboxes input:checked')).map(cb => cb.value);
-        const traitData = userSelectedTraits.map(t => ({n: t.name, s: t.source}));
-        if (skills.length === 0 && traitData.length === 0) return;
-        payload = { d: target, s: skills, t: traitData };
+        const jsonStr = atob(code);
+        const payload = JSON.parse(jsonStr);
+        
+        if(payload.t) {
+            document.getElementById('builderDevSelect').value = payload.t;
+            onBuilderDevChange(); 
+        }
+        
+        if(payload.tr && Array.isArray(payload.tr)) {
+            desiredTraits = payload.tr;
+            renderSelectedTraits();
+        }
+        
+        generatePlan(); 
+        
+    } catch(e) {
+        alert("Invalid Share Code");
+        console.error(e);
     }
-    const base64 = btoa(JSON.stringify(payload));
-    navigator.clipboard.writeText(base64);
-    document.getElementById('shareCodeInput').value = base64;
-    document.getElementById('shareStatus').textContent = "Copied!";
 }
 
-init();
+function openDataModal() {
+    document.getElementById('dataSyncModal').classList.remove('hidden');
+    checkDataSync(traits, matrix, arenaShops);
+}
+function closeDataModal() {
+    document.getElementById('dataSyncModal').classList.add('hidden');
+}
+
+function checkDataSync(t, m, s) {
+    const div = document.getElementById('dataSyncStatus');
+    if(!div) return;
+    
+    div.innerHTML = `
+        <p><b>Traits Loaded:</b> ${t.length}</p>
+        <p><b>Deviations (Matrix):</b> ${Object.keys(m).length}</p>
+        <p><b>Arena Shop Items:</b> ${s.length}</p>
+        <hr style="border-color:#444;">
+        <p style="font-size:0.8rem; color:#aaa;">Data verified.</p>
+    `;
+}
