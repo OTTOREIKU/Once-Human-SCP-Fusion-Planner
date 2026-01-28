@@ -49,15 +49,16 @@
     <div id="arenaShops" class="tool-panel hidden" style="border-top-color: var(--success);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
             <h3 style="margin:0;">Arena Shops</h3>
-            <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 200px;">
+            
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <div id="shop-filters" style="display:flex; gap:5px; flex-wrap:wrap;">
+                    <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
+                    <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
+                    <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
+                </div>
+                <input type="text" id="searchArenaShop" placeholder="Search..." onkeyup="buildArenaShops()" style="max-width: 200px;">
+            </div>
         </div>
-        
-        <div id="shop-filters" style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:15px;">
-            <button class="filter-btn active" onclick="applyShopFilter('All', this)">All</button>
-            <button class="filter-btn" onclick="applyShopFilter('Species Code', this)">Species Code</button>
-            <button class="filter-btn" onclick="applyShopFilter('Skill Mutagen', this)">Skill Mutagen</button>
-        </div>
-        
         <div id="arenaShopsContainer" class="arena-grid-layout"></div>
     </div>
 
@@ -75,20 +76,24 @@
     </div>
 
     <div id="traitsLibrary" class="tool-panel hidden" style="border-top-color: var(--purple);">
-        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; margin-bottom:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
             <h3 style="margin:0;">Traits Library</h3>
-            <input type="text" id="searchTraits" placeholder="Search..." onkeyup="filterTraits()" style="max-width: 200px;">
+            
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                    <button class="filter-btn active" onclick="applyFilter('All', this)">All</button>
+                    <button class="filter-btn" onclick="applyFilter('Global', this)">Global</button>
+                    <button class="filter-btn" onclick="applyFilter('Combat', this)">Combat</button>
+                    <button class="filter-btn" onclick="applyFilter('Territory', this)">Territory</button>
+                    <button class="filter-btn" onclick="applyFilter('Crafting', this)">Crafting</button>
+                    <button class="filter-btn" onclick="applyFilter('Animal', this)">Animal</button>
+                    <button class="filter-btn" onclick="applyFilter('Furniture', this)">Furniture</button>
+                    <button class="filter-btn" onclick="applyFilter('Variation', this)">Variations</button>
+                </div>
+                <input type="text" id="searchTraits" placeholder="Search..." onkeyup="filterTraits()" style="max-width: 200px;">
+            </div>
         </div>
-        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:15px;">
-            <button class="filter-btn active" onclick="applyFilter('All', this)">All</button>
-            <button class="filter-btn" onclick="applyFilter('Global', this)">Global</button>
-            <button class="filter-btn" onclick="applyFilter('Combat', this)">Combat</button>
-            <button class="filter-btn" onclick="applyFilter('Territory', this)">Territory</button>
-            <button class="filter-btn" onclick="applyFilter('Crafting', this)">Crafting</button>
-            <button class="filter-btn" onclick="applyFilter('Animal', this)">Animal</button>
-            <button class="filter-btn" onclick="applyFilter('Furniture', this)">Furniture</button>
-            <button class="filter-btn" onclick="applyFilter('Variation', this)">Variations</button>
-        </div>
+        
         <div style="overflow-x:auto; max-height:400px; border:1px solid var(--border);">
             <table id="traitsTable">
                 <thead><tr><th width="20%">Name</th><th width="15%">Source</th><th width="15%">Category</th><th>Description</th></tr></thead>
