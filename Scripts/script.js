@@ -249,20 +249,11 @@ function filterTechniquesLib() { const val = document.getElementById('searchTech
 
 function buildTraitsTable() { 
     const tbody = document.getElementById('traitsBody');
-    const sortedTraits = [...traits].sort((a, b) => {
-        const slotA = a.slot || 0;
-        const slotB = b.slot || 0;
-        return slotB - slotA; 
-    });
+    const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        let slotBadge = '';
-        if (t.slot) {
-            let badgeColor = '#444'; 
-            if (t.slot === 1) badgeColor = '#666'; 
-            
-            slotBadge = `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px; margin-left:8px;">S${t.slot}</span>`;
-        }
+        // UPDATED: Now using CSS class instead of inline style
+        let slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
         <tr data-category="${t.category}" data-slot="${t.slot || 'none'}">
@@ -418,14 +409,12 @@ function addTrait() {
 }
 function removeTrait(index) { userSelectedTraits.splice(index, 1); renderSelectedTraits(); }
 
-// UPDATED: Render the small cards with the Slot Badge
 function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        let badgeColor = '#444';
-        if (t.slot === 1) badgeColor = '#666'; 
-        const slotBadge = t.slot ? `<span style="font-size:0.7em; color:#ddd; background:${badgeColor}; padding:0 4px; border-radius:3px; margin-left:5px;">S${t.slot}</span>` : '';
+        // UPDATED: Now using CSS class instead of inline style
+        const slotBadge = t.slot ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
 
         container.innerHTML += `
             <div class="trait-mini-card">
@@ -529,13 +518,11 @@ function generatePlan() {
         });
     }
 
-    // UPDATED: Render the result cards with the Slot Badge in the header
     if (userSelectedTraits.length > 0) {
         html += `<div style="grid-column:1/-1; margin:15px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px; color:white; font-weight:bold;">PASSIVE TRAIT SOURCES</div>`;
         userSelectedTraits.forEach(t => {
-            let badgeColor = '#444'; 
-            if (t.slot === 1) badgeColor = '#666'; 
-            const slotBadge = t.slot ? `<span style="float:right; font-size:0.75rem; color:white; background:${badgeColor}; padding:1px 6px; border-radius:4px;">S${t.slot}</span>` : '';
+            // UPDATED: Now using CSS class instead of inline style
+            const slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
             html += `
                 <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">

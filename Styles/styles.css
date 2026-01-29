@@ -347,6 +347,32 @@ tr:hover { background-color: #2a2a2a; }
     pointer-events: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); line-height: 1.4;
 }
 
+/* === SLOT BADGES === */
+.slot-badge {
+    background-color: #444;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.75rem;
+    font-weight: normal;
+    user-select: none;
+}
+
+/* Variant 1: Used in Tables and Result Cards (Floats to the right) */
+.slot-badge.float-right {
+    float: right;
+    margin-left: 8px;
+}
+
+/* Variant 2: Used in Mini Tags (Smaller, inline) */
+.slot-badge.mini {
+    font-size: 0.7em;
+    padding: 0 4px;
+    border-radius: 3px;
+    margin-left: 5px;
+    color: #ddd;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .team-grid, .compare-grid, .arena-grid-layout { grid-template-columns: 1fr; }
@@ -358,3 +384,4 @@ tr:hover { background-color: #2a2a2a; }
         justify-content: center;
     }
 }
+
