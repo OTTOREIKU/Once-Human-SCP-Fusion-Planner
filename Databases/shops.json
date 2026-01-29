@@ -32,7 +32,7 @@
   {
     "arena": "Hot Springs Arena",
     "items": [
-      {"name": "Chaos Pyro Dino", "type": "Species Code", "cost": 300},
+      {"name": "Chaosaurus", "type": "Species Code", "cost": 300},
       {"name": "Director Fox", "type": "Species Code", "cost": 120},
       {"name": "Tar Pudding", "type": "Species Code", "cost": 120},
       {"name": "Pyro Dino", "type": "Species Code", "cost": 120},
@@ -127,3 +127,4 @@
     ]
   }
 ]
+
