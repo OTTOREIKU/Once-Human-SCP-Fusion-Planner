@@ -90,7 +90,9 @@ function filterTraitDropdown() {
         matches.slice(0, 10).forEach(t => {
             const div = document.createElement('div');
             div.className = 'trait-option';
-            div.innerHTML = `${t.name} <span>[${t.source}]</span>`;
+            // UPDATED: Added [S#] to the dropdown display
+            const slotStr = t.slot ? ` [S${t.slot}]` : '';
+            div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
             div.onclick = () => selectTraitFromDropdown(t.name, t.source);
             dropdown.appendChild(div);
         });
@@ -396,6 +398,10 @@ function addTrait() {
     let traitName = val; let traitSource = "";
     const match = val.match(/^(.*) \[(.*)\]$/);
     if (match) { traitName = match[1]; traitSource = match[2]; }
+    
+    // Clean up input if [S#] was included in selection
+    traitSource = traitSource.replace(/\s*\[S\d+\]$/, '');
+
     let traitInfo;
     if (traitSource) traitInfo = traits.find(t => t.name === traitName && t.source === traitSource);
     else traitInfo = traits.find(t => t.name === traitName);
@@ -528,20 +534,23 @@ function generatePlan() {
         });
 
         userSelectedTraits.forEach(t => {
-            const slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
+            // UPDATED: No float class here
+            const slotBadge = t.slot ? `<span class="slot-badge">S${t.slot}</span>` : '';
             
             // Check for duplicate slot
             let warningBadge = '';
             if (t.slot && slotCounts[t.slot] > 1) {
+                // UPDATED: No float class here either
                 warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: duplicate slot detected, you can only have one trait from each slot on the deviation')" onmouseleave="hideTooltip()">!</span>`;
             }
 
+            // UPDATED: Reordered HTML structure (Title -> Warning -> Slot) and added left-align class
             html += `
                 <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">
-                    <div class="card-header">
+                    <div class="card-header left-align">
                         <span class="card-title">${t.name}</span>
-                        ${slotBadge}
                         ${warningBadge}
+                        ${slotBadge}
                     </div>
                     <div class="card-body">Source: <strong style="color:white">${t.source}</strong></div>
                 </div>
