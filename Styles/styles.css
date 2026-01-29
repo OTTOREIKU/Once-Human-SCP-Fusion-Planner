@@ -159,7 +159,7 @@ input:focus, select:focus { outline: none; border-color: #666; }
 
 /* Scroll Wrapper for Arena Tables */
 .arena-scroll {
-    max-height: 300px; /* Increased to show ~10 items */
+    max-height: 300px; 
     overflow-y: auto;
 }
 /* Scrollbar Styling */
@@ -204,7 +204,7 @@ tr:hover { background-color: #2a2a2a; }
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 4px;
-    border-left: 4px solid #666; /* Default Neutral */
+    border-left: 4px solid #666; 
     display: flex; flex-direction: column; gap: 8px;
     position: relative;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -253,7 +253,7 @@ tr:hover { background-color: #2a2a2a; }
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(191, 90, 242, 0.15); /* Light Purple Background */
+    background: rgba(191, 90, 242, 0.15); 
     border: 1px solid var(--purple);
     border-radius: 4px;
     padding: 6px 12px;
@@ -294,8 +294,8 @@ tr:hover { background-color: #2a2a2a; }
 
 /* Active Slot: White Side Bar + Grayscale Diff */
 .team-slot.active-slot { 
-    border-left-color: #ffffff; /* White Side Bar */
-    background: #333333; /* Slightly lighter grayscale */
+    border-left-color: #ffffff; 
+    background: #333333; 
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     border-top: 1px solid #555;
     border-right: 1px solid #555;
@@ -356,15 +356,14 @@ tr:hover { background-color: #2a2a2a; }
     font-size: 0.75rem;
     font-weight: normal;
     user-select: none;
-}
+    display: inline-block; 
 
-/* Variant 1: Used in Tables and Result Cards (Floats to the right) */
+/* Variant 1: Used in Tables */
 .slot-badge.float-right {
-    float: right;
-    margin-left: 8px;
+    margin-left: 0; 
 }
 
-/* Variant 2: Used in Mini Tags (Smaller, inline) */
+/* Variant 2: Used in Mini Tags */
 .slot-badge.mini {
     font-size: 0.7em;
     padding: 0 4px;
@@ -383,9 +382,14 @@ tr:hover { background-color: #2a2a2a; }
     font-weight: bold;
     user-select: none;
     cursor: help;
-    float: right;
-    margin-left: 5px;
-    margin-right: 2px;
+    display: inline-block;
+}
+
+/* === HEADER ALIGNMENT UTILITY === */
+.card-header.left-align {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
 }
 
 /* RESPONSIVE */
@@ -399,5 +403,3 @@ tr:hover { background-color: #2a2a2a; }
         justify-content: center;
     }
 }
-
-
