@@ -317,7 +317,7 @@
   },
   {
     "name": "Weakspot Sniper",
-    "description": "Marks the target's head, then triggers an explosion dealing single-target damage. On a successful roll, also deals 100% bonus damage and stuns."
+    "description": "Aims at the target to deal P.ATK DMG, with a chance to deal additional damage and stun the target for 1s."
   },
   {
     "name": "Whale Invasion",
