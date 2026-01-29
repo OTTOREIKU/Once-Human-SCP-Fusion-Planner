@@ -121,7 +121,7 @@
   },
   {
     "name": "Flaming Flight",
-    "description": "Charges forward, leaving a burning trail that deals damage and inflicts Burn."
+    "description": "Leaves a burning trail, dealing SP.ATK DMG every 1.5s. Inflicts Burn on hit targets for 10s, dealing SP.ATK DMG per second."
   },
   {
     "name": "Frost Satellite",
