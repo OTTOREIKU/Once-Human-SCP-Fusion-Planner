@@ -1,35 +1,28 @@
 :root {
-    /* Core Palette */
     --bg-body: #121212; 
     --bg-panel: #1e1e1e; 
     --bg-input: #2d2d30;
     --bg-card: #252526;
     
-    /* Borders & Radius */
     --border: #3e3e42; 
     --radius: 4px;
 
-    /* Text */
     --text-main: #e0e0e0; 
     --text-muted: #858585;
     
-    /* Accents */
-    --accent: #00d4f1; /* Teal */
+    --accent: #00d4f1; 
     --purple: #bf5af2;
     --success: #4caf50; 
     --warning: #ffc107; 
     --danger: #ff5252;
     
-    /* Chaos Cost Color */
-    --chaos-cost: #ff7043; /* Red/Orange */
+    --chaos-cost: #ff7043; 
     
-    /* Deviant Types */
     --type-combat: #ff5252; 
     --type-territory: #4caf50; 
     --type-crafting: #2196f3; 
     --type-all: #757575;
     
-    /* Fonts */
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -136,7 +129,6 @@ input:focus, select:focus { outline: none; border-color: #666; }
 
 .header-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
 
-/* Arena Grid */
 .arena-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
 @media (min-width: 1100px) { .arena-grid-layout { grid-template-columns: repeat(4, 1fr); } }
 
@@ -157,12 +149,10 @@ input:focus, select:focus { outline: none; border-color: #666; }
     font-size: 0.9rem; 
 }
 
-/* Scroll Wrapper for Arena Tables */
 .arena-scroll {
     max-height: 300px; 
     overflow-y: auto;
 }
-/* Scrollbar Styling */
 .arena-scroll::-webkit-scrollbar { width: 6px; }
 .arena-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
 .arena-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
@@ -177,7 +167,6 @@ input:focus, select:focus { outline: none; border-color: #666; }
 }
 .arena-table tr:last-child td { border-bottom: none; }
 
-/* Specific Column Styling */
 .arena-table .arena-type {
     font-size: 0.7rem;
     font-style: italic;
@@ -191,7 +180,6 @@ input:focus, select:focus { outline: none; border-color: #666; }
     font-size: 0.8rem;
 }
 
-/* General Tables */
 table { width: 100%; border-collapse: collapse; }
 th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; font-size: 0.85rem; }
 th { background: #252526; color: #e0e0e0; font-weight: 600; }
@@ -211,12 +199,13 @@ tr:hover { background-color: #2a2a2a; }
 }
 
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.card-header.left-align { justify-content: flex-start; align-items: center; gap: 8px; }
+
 .card-title { font-weight: 700; font-size: 1rem; color: white; }
 .card-body { font-size: 0.85rem; color: #ccc; }
 .card-divider { height: 1px; background: #3e3e42; margin: 6px 0; }
 .card-risk { font-size: 0.8rem; color: var(--danger); margin-top: 4px; }
 
-/* Status Colors (Left Bar) */
 .status-perfect { border-left-color: var(--success); }
 .status-good { border-left-color: var(--warning); }
 .status-risky { border-left-color: var(--danger); }
@@ -224,12 +213,10 @@ tr:hover { background-color: #2a2a2a; }
 .status-crafting { border-left-color: var(--type-crafting); }
 .status-purple { border-left-color: var(--purple); }
 
-/* Gradient Backgrounds */
 .gradient-card.status-perfect { background: linear-gradient(90deg, rgba(76, 175, 80, 0.1) 0%, transparent 100%); }
 .gradient-card.status-good { background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, transparent 100%); }
 .gradient-card.status-risky { background: linear-gradient(90deg, rgba(255, 82, 82, 0.1) 0%, transparent 100%); }
 
-/* Badges */
 .card-badge { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px; }
 .status-perfect .card-badge { color: var(--success); background: rgba(76, 175, 80, 0.15); }
 .status-good .card-badge { color: var(--warning); background: rgba(255, 193, 7, 0.15); }
@@ -238,17 +225,52 @@ tr:hover { background-color: #2a2a2a; }
 .status-crafting .card-badge { color: var(--type-crafting); background: rgba(33, 150, 243, 0.15); }
 .badge-shop { background: #2e7d32; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-right: 5px; display: inline-block; cursor: help; }
 
-/* Tags */
+/* === SLOT BADGES === */
+.slot-badge {
+    background-color: #444;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.75rem;
+    font-weight: normal;
+    user-select: none;
+    display: inline-block;
+}
+
+.slot-badge.float-right {
+    float: right;
+    margin-left: 8px;
+}
+
+.slot-badge.mini {
+    font-size: 0.7em;
+    padding: 0 4px;
+    border-radius: 3px;
+    margin-left: 5px;
+    color: #ddd;
+}
+
+/* === WARNING BADGE === */
+.warning-badge {
+    background-color: var(--danger);
+    color: white;
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    user-select: none;
+    cursor: help;
+    display: inline-block;
+}
+
 .tag-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; min-height: 72px; align-content: flex-start; }
 .uni-tag { font-size: 0.7rem; background: #333; padding: 2px 8px; border: 1px solid #444; color: #bbb; border-radius: 4px; cursor: help; }
 .uni-tag:hover { border-color: var(--accent); color: white; background: #444; }
 
-/* Donor Card Specifics */
 .donor-card { min-height: 110px; justify-content: space-between; }
 .donor-select-container { margin-top: auto; padding-top: 10px; }
 .donor-select { width: 100%; padding: 6px; background: #1a1a1a; font-size: 0.8rem; border: 1px solid #444; color: white; border-radius: 4px; }
 
-/* === TRAIT MINI CARD === */
 .trait-mini-card {
     display: inline-flex;
     align-items: center;
@@ -275,14 +297,12 @@ tr:hover { background-color: #2a2a2a; }
     color: #fff;
 }
 
-/* === SQUAD BUILDER TAGS === */
 .tag-tech { border-color: rgba(0, 212, 241, 0.3); }
 .tag-tech:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 212, 241, 0.1); }
 
 .tag-trait { border-color: rgba(191, 90, 242, 0.3); }
 .tag-trait:hover { border-color: var(--purple); color: var(--purple); background: rgba(191, 90, 242, 0.1); }
 
-/* === SQUAD BUILDER SLOTS === */
 .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
 .team-slot {
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
@@ -292,7 +312,6 @@ tr:hover { background-color: #2a2a2a; }
 }
 .team-slot:hover { background: #2a2a2a; }
 
-/* Active Slot: White Side Bar + Grayscale Diff */
 .team-slot.active-slot { 
     border-left-color: #ffffff; 
     background: #333333; 
@@ -304,7 +323,6 @@ tr:hover { background-color: #2a2a2a; }
 
 .empty-slot { border-left: 4px dashed #444; align-items: center; justify-content: center; color: #666; font-size: 2rem; }
 
-/* === TRAIT SEARCH DROPDOWN === */
 .input-with-dropdown { position: relative; flex: 1; }
 #traitInput { width: 100%; box-sizing: border-box; }
 .trait-dropdown {
@@ -320,7 +338,6 @@ tr:hover { background-color: #2a2a2a; }
 .trait-option:hover { background: #333; color: white; }
 .trait-option span { color: #666; font-size: 0.8rem; margin-left: 5px; }
 
-/* === COMPARISON TOOL === */
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px; }
 .compare-col { background: var(--bg-card); border: 1px solid var(--border); padding: 10px; border-radius: var(--radius); }
 .col-header { text-align: center; font-weight: bold; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; font-size: 0.9rem; color: white; }
@@ -328,11 +345,9 @@ tr:hover { background-color: #2a2a2a; }
 .skill-item:hover { background: #444; color: white; }
 .skill-shared { color: var(--accent); border: 1px solid rgba(0, 212, 241, 0.3); background: rgba(0, 212, 241, 0.05); }
 
-/* === MODAL & TOOLTIP === */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; display: flex; justify-content: center; align-items: center; }
 .modal-content { background: var(--bg-panel); border: 1px solid var(--border); padding: 25px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; border-radius: var(--radius); }
 
-/* Improved Close Button (Clickable Box) */
 .close-modal { 
     cursor: pointer; font-size: 1.2rem; color: #aaa; transition: all 0.2s; 
     width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
@@ -347,57 +362,10 @@ tr:hover { background-color: #2a2a2a; }
     pointer-events: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); line-height: 1.4;
 }
 
-/* === SLOT BADGES === */
-.slot-badge {
-    background-color: #444;
-    color: white;
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 0.75rem;
-    font-weight: normal;
-    user-select: none;
-    display: inline-block; 
-
-/* Variant 1: Used in Tables */
-.slot-badge.float-right {
-    margin-left: 0; 
-}
-
-/* Variant 2: Used in Mini Tags */
-.slot-badge.mini {
-    font-size: 0.7em;
-    padding: 0 4px;
-    border-radius: 3px;
-    margin-left: 5px;
-    color: #ddd;
-}
-
-/* === WARNING BADGE === */
-.warning-badge {
-    background-color: var(--danger);
-    color: white;
-    border-radius: 4px;
-    padding: 1px 8px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    user-select: none;
-    cursor: help;
-    display: inline-block;
-}
-
-/* === HEADER ALIGNMENT UTILITY === */
-.card-header.left-align {
-    justify-content: flex-start;
-    align-items: center;
-    gap: 10px;
-}
-
-/* RESPONSIVE */
 @media (max-width: 768px) {
     .team-grid, .compare-grid, .arena-grid-layout { grid-template-columns: 1fr; }
     .header-actions { flex-direction: column; }
     
-    /* Force buttons to stay on the same line on mobile */
     .header-actions > div { 
         flex-direction: row !important; 
         justify-content: center;
