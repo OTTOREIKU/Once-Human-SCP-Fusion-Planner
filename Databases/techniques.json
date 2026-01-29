@@ -297,11 +297,15 @@
   },
   {
     "name": "Super Flammable",
-    "description": "Triggers when HP falls below 30%. When near the target, gradually grows to 3X size and self destructs after 4s, dealing AOE DMG equal to 300% of remaining HP."
+    "description": "Self-destructs after staying near the target for 5s, dealing AoE SP.ATK DMG. Has a chance to trigger when HP drops below 30%."
   },
   {
     "name": "Sweep",
     "description": "Performs a melee attack in an area, dealing P.ATK DMG."
+  },
+  {
+    "name": "Torpedo",
+    "description": "Fires a randomly moving fish that deals SP.ATK DMG based on the caster's Attack and applies Power Surge to enemies on collision."
   },
   {
     "name": "Upper World Protection",
