@@ -121,7 +121,7 @@
   },
   {
     "name": "Flaming Flight",
-    "description": "Charges forward, leaving a burning trail that deals damage and inflicts Burn."
+    "description": "Leaves a burning trail, dealing SP.ATK DMG every 1.5s. Inflicts Burn on hit targets for 10s, dealing SP.ATK DMG per second."
   },
   {
     "name": "Frost Satellite",
@@ -297,11 +297,15 @@
   },
   {
     "name": "Super Flammable",
-    "description": "Triggers when HP falls below 30%. When near the target, gradually grows to 3X size and self destructs after 4s, dealing AOE DMG equal to 300% of remaining HP."
+    "description": "Self-destructs after staying near the target for 5s, dealing AoE SP.ATK DMG. Has a chance to trigger when HP drops below 30%."
   },
   {
     "name": "Sweep",
     "description": "Performs a melee attack in an area, dealing P.ATK DMG."
+  },
+  {
+    "name": "Torpedo",
+    "description": "Fires a randomly moving fish that deals SP.ATK DMG based on the caster's Attack and applies Power Surge to enemies on collision."
   },
   {
     "name": "Upper World Protection",
@@ -313,7 +317,7 @@
   },
   {
     "name": "Weakspot Sniper",
-    "description": "Marks the target's head, then triggers an explosion dealing single-target damage. On a successful roll, also deals 100% bonus damage and stuns."
+    "description": "Aims at the target to deal P.ATK DMG, with a chance to deal additional damage and stun the target for 1s."
   },
   {
     "name": "Whale Invasion",

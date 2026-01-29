@@ -90,7 +90,8 @@ function filterTraitDropdown() {
         matches.slice(0, 10).forEach(t => {
             const div = document.createElement('div');
             div.className = 'trait-option';
-            div.innerHTML = `${t.name} <span>[${t.source}]</span>`;
+            const slotStr = t.slot ? ` [S${t.slot}]` : '';
+            div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
             div.onclick = () => selectTraitFromDropdown(t.name, t.source);
             dropdown.appendChild(div);
         });
@@ -252,7 +253,6 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        // UPDATED: Now using CSS class instead of inline style
         let slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
@@ -397,6 +397,9 @@ function addTrait() {
     let traitName = val; let traitSource = "";
     const match = val.match(/^(.*) \[(.*)\]$/);
     if (match) { traitName = match[1]; traitSource = match[2]; }
+    
+    traitSource = traitSource.replace(/\s*\[S\d+\]$/, '');
+
     let traitInfo;
     if (traitSource) traitInfo = traits.find(t => t.name === traitName && t.source === traitSource);
     else traitInfo = traits.find(t => t.name === traitName);
@@ -413,7 +416,6 @@ function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        // UPDATED: Now using CSS class instead of inline style
         const slotBadge = t.slot ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
 
         container.innerHTML += `
@@ -520,14 +522,27 @@ function generatePlan() {
 
     if (userSelectedTraits.length > 0) {
         html += `<div style="grid-column:1/-1; margin:15px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px; color:white; font-weight:bold;">PASSIVE TRAIT SOURCES</div>`;
+        
+        const slotCounts = {};
         userSelectedTraits.forEach(t => {
-            // UPDATED: Now using CSS class instead of inline style
-            const slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
+            if (t.slot) {
+                slotCounts[t.slot] = (slotCounts[t.slot] || 0) + 1;
+            }
+        });
+
+        userSelectedTraits.forEach(t => {
+            const slotBadge = t.slot ? `<span class="slot-badge">S${t.slot}</span>` : '';
+            
+            let warningBadge = '';
+            if (t.slot && slotCounts[t.slot] > 1) {
+                warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: duplicate slot detected, you can only have one trait from each slot on the deviation')" onmouseleave="hideTooltip()">!</span>`;
+            }
 
             html += `
                 <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">
-                    <div class="card-header">
+                    <div class="card-header left-align">
                         <span class="card-title">${t.name}</span>
+                        ${warningBadge}
                         ${slotBadge}
                     </div>
                     <div class="card-body">Source: <strong style="color:white">${t.source}</strong></div>
