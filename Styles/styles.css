@@ -373,6 +373,21 @@ tr:hover { background-color: #2a2a2a; }
     color: #ddd;
 }
 
+/* === WARNING BADGE === */
+.warning-badge {
+    background-color: var(--danger);
+    color: white;
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    user-select: none;
+    cursor: help;
+    float: right;
+    margin-left: 5px;
+    margin-right: 2px;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .team-grid, .compare-grid, .arena-grid-layout { grid-template-columns: 1fr; }
@@ -384,4 +399,5 @@ tr:hover { background-color: #2a2a2a; }
         justify-content: center;
     }
 }
+
 
