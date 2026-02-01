@@ -535,7 +535,7 @@ function generatePlan() {
             
             let warningBadge = '';
             if (t.slot && slotCounts[t.slot] > 1) {
-                warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: duplicate slot detected, you can only have one trait from each slot on the deviation')" onmouseleave="hideTooltip()">!</span>`;
+                warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, '')" onmouseleave="hideTooltip()">!</span>`;
             }
 
             html += `
@@ -620,3 +620,4 @@ function generateShareCode() {
 }
 
 init();
+
