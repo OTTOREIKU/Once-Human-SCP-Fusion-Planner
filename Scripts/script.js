@@ -535,6 +535,7 @@ function generatePlan() {
             
             let warningBadge = '';
             if (t.slot && slotCounts[t.slot] > 1) {
+                /* warning text goes inside the (event, 'xxx') area ie. Warning: Duplicate Slot....etc */
                 warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, '')" onmouseleave="hideTooltip()">!</span>`;
             }
 
@@ -620,4 +621,5 @@ function generateShareCode() {
 }
 
 init();
+
 
