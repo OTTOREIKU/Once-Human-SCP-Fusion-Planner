@@ -6,7 +6,6 @@ let shopDeviationNames = new Set();
 let shopDeviationArena = {}; 
 
 let currentCategoryFilter = 'All';
-let currentSlotFilter = 'All';
 let currentDeviantTypeFilter = 'All';
 let currentShopFilter = 'All';
 let userSelectedTraits = []; 
@@ -90,8 +89,7 @@ function filterTraitDropdown() {
         matches.slice(0, 10).forEach(t => {
             const div = document.createElement('div');
             div.className = 'trait-option';
-            const slotStr = t.slot ? ` [S${t.slot}]` : '';
-            div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
+            div.innerHTML = `${t.name} <span>[${t.source}]</span>`;
             div.onclick = () => selectTraitFromDropdown(t.name, t.source);
             dropdown.appendChild(div);
         });
@@ -253,13 +251,10 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        let slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
-
         return `
-        <tr data-category="${t.category}" data-slot="${t.slot || 'none'}">
+        <tr data-category="${t.category}">
             <td style="font-weight:600; color:#e0e0e0;">
                 ${t.name}
-                ${slotBadge}
             </td>
             <td>${t.source || '-'}</td>
             <td>${t.category}</td>
@@ -271,16 +266,9 @@ function buildTraitsTable() {
 function applyFilter(category, btn) { 
     currentCategoryFilter = category; 
     const container = btn.parentElement;
-    container.querySelectorAll('.filter-btn:not(.slot-btn)').forEach(b => b.classList.remove('active'));
+    container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); 
     filterTraits(); 
-}
-
-function applySlotFilter(slot, btn) {
-    currentSlotFilter = String(slot);
-    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterTraits();
 }
 
 function filterTraits() { 
@@ -289,13 +277,11 @@ function filterTraits() {
     document.querySelectorAll('#traitsBody tr').forEach(row => { 
         const text = row.innerText.toUpperCase(); 
         const cat = row.getAttribute('data-category'); 
-        const slot = row.getAttribute('data-slot'); 
         
         const matchCat = (currentCategoryFilter === 'All') || (cat === currentCategoryFilter); 
-        const matchSlot = (currentSlotFilter === 'All') || (String(slot) === currentSlotFilter);
         const matchText = text.includes(val);
 
-        if (matchText && matchCat && matchSlot) {
+        if (matchText && matchCat) {
             row.style.display = "";
         } else {
             row.style.display = "none";
@@ -398,8 +384,8 @@ function addTrait() {
     const match = val.match(/^(.*) \[(.*)\]$/);
     if (match) { traitName = match[1]; traitSource = match[2]; }
     
-    traitSource = traitSource.replace(/\s*\[S\d+\]$/, '');
-
+    // Removed legacy slot text replacement logic
+    
     let traitInfo;
     if (traitSource) traitInfo = traits.find(t => t.name === traitName && t.source === traitSource);
     else traitInfo = traits.find(t => t.name === traitName);
@@ -416,11 +402,9 @@ function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        const slotBadge = t.slot ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
-
         container.innerHTML += `
             <div class="trait-mini-card">
-                <span>${t.name}${slotBadge}</span>
+                <span>${t.name}</span>
                 <span class="remove-btn" onclick="removeTrait(${idx}); event.stopPropagation();">✕</span>
             </div>`;
     });
@@ -523,27 +507,11 @@ function generatePlan() {
     if (userSelectedTraits.length > 0) {
         html += `<div style="grid-column:1/-1; margin:15px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px; color:white; font-weight:bold;">PASSIVE TRAIT SOURCES</div>`;
         
-        const slotCounts = {};
         userSelectedTraits.forEach(t => {
-            if (t.slot) {
-                slotCounts[t.slot] = (slotCounts[t.slot] || 0) + 1;
-            }
-        });
-
-        userSelectedTraits.forEach(t => {
-            const slotBadge = t.slot ? `<span class="slot-badge">S${t.slot}</span>` : '';
-            
-            let warningBadge = '';
-            if (t.slot && slotCounts[t.slot] > 1) {
-                warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: duplicate slot detected, you can only have one trait from each slot on the deviation')" onmouseleave="hideTooltip()">!</span>`;
-            }
-
             html += `
                 <div class="uni-card status-purple" onmouseenter="showTooltip(event, '${safeTooltip(t.description)}')" onmouseleave="hideTooltip()">
                     <div class="card-header left-align">
                         <span class="card-title">${t.name}</span>
-                        ${warningBadge}
-                        ${slotBadge}
                     </div>
                     <div class="card-body">Source: <strong style="color:white">${t.source}</strong></div>
                 </div>
@@ -620,3 +588,493 @@ function generateShareCode() {
 }
 
 init();
+
+}
+
+{
+type: uploaded file
+fileName: slots.js
+fullContent:
+/* ========================================================================
+   ARCHIVED SLOT LOGIC
+   Disabled Feature: Slot Filtering and Badges
+   Date Archived: 2023-10-XX
+   Reason: Data inconsistencies in slot assignments.
+   
+   To restore:
+   1. Add this file to index.html (uncomment the script tag) or merge logic back to script.js.
+   2. Restore the buttons in index.html.
+   3. Restore the CSS in styles.css.
+========================================================================
+*/
+
+/* === ARCHIVED CSS (styles.css) ===
+
+.slot-badge {
+    background-color: #444;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.75rem;
+    font-weight: normal;
+    user-select: none;
+    display: inline-block;
+}
+
+.slot-badge.float-right {
+    float: right;
+    margin-left: 8px;
+}
+
+.slot-badge.mini {
+    font-size: 0.7em;
+    padding: 0 4px;
+    border-radius: 3px;
+    margin-left: 5px;
+    color: #ddd;
+}
+
+.warning-badge {
+    background-color: var(--danger);
+    color: white;
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    user-select: none;
+    cursor: help;
+    display: inline-block;
+}
+
+.card-header.left-align {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+*/
+
+
+/* === ARCHIVED JS FUNCTIONS === */
+
+// State Variable
+// let currentSlotFilter = 'All';
+
+// Function: Apply Slot Filter (Button Click)
+function applySlotFilter(slot, btn) {
+    currentSlotFilter = String(slot);
+    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTraits();
+}
+
+/* LOGIC SNIPPET: Filter Traits (Inside filterTraits function)
+   
+   const slot = row.getAttribute('data-slot'); 
+   const matchSlot = (currentSlotFilter === 'All') || (String(slot) === currentSlotFilter);
+   
+   // Add matchSlot to the final condition
+   if (matchText && matchCat && matchSlot) ...
+*/
+
+
+/* LOGIC SNIPPET: Build Table Badge (Inside buildTraitsTable)
+   
+   let slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
+   // Add ${slotBadge} inside the <td>
+*/
+
+
+/* LOGIC SNIPPET: Dropdown Text (Inside filterTraitDropdown)
+   
+   const slotStr = t.slot ? ` [S${t.slot}]` : '';
+   div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
+*/
+
+
+/* LOGIC SNIPPET: Render Selected Traits (Inside renderSelectedTraits)
+   
+   const slotBadge = t.slot ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
+   // Add ${slotBadge} to span
+*/
+
+
+/* LOGIC SNIPPET: Generate Plan - Duplicate Warning (Inside generatePlan)
+   
+   // 1. Calculate Duplicates
+   const slotCounts = {};
+   userSelectedTraits.forEach(t => {
+       if (t.slot) {
+           slotCounts[t.slot] = (slotCounts[t.slot] || 0) + 1;
+       }
+   });
+
+   // 2. Render Badge & Warning
+   userSelectedTraits.forEach(t => {
+       const slotBadge = t.slot ? `<span class="slot-badge">S${t.slot}</span>` : '';
+       
+       let warningBadge = '';
+       if (t.slot && slotCounts[t.slot] > 1) {
+           warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: duplicate slot detected...')" onmouseleave="hideTooltip()">!</span>`;
+       }
+
+       html += `
+           <div class="uni-card status-purple" ...>
+               <div class="card-header left-align">
+                   <span class="card-title">${t.name}</span>
+                   ${warningBadge}
+                   ${slotBadge}
+               </div>
+               ...
+           </div>
+       `;
+   });
+*/
+}
+
+{
+type: uploaded file
+fileName: styles.css
+fullContent:
+:root {
+    --bg-body: #121212; 
+    --bg-panel: #1e1e1e; 
+    --bg-input: #2d2d30;
+    --bg-card: #252526;
+    
+    --border: #3e3e42; 
+    --radius: 4px;
+
+    --text-main: #e0e0e0; 
+    --text-muted: #858585;
+    
+    --accent: #00d4f1; 
+    --purple: #bf5af2;
+    --success: #4caf50; 
+    --warning: #ffc107; 
+    --danger: #ff5252;
+    
+    --chaos-cost: #ff7043; 
+    
+    --type-combat: #ff5252; 
+    --type-territory: #4caf50; 
+    --type-crafting: #2196f3; 
+    --type-all: #757575;
+    
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body { 
+    background: var(--bg-body); 
+    color: var(--text-main); 
+    font-family: var(--font-ui); 
+    margin: 0; 
+    padding: 20px; 
+    line-height: 1.5; 
+}
+
+.container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+}
+
+/* === TYPOGRAPHY === */
+h1, h2, h3, h4 { 
+    font-family: var(--font-ui); 
+    color: white; 
+    margin-top: 0; 
+    font-weight: 700; 
+}
+.accent-text { color: var(--accent); }
+
+/* === BUTTONS === */
+button, .btn-link {
+    font-family: var(--font-ui); 
+    font-size: 0.9rem; 
+    padding: 8px 16px;
+    background: #333; 
+    border: 1px solid var(--border); 
+    color: #e0e0e0;
+    border-radius: var(--radius); 
+    cursor: pointer; 
+    transition: background 0.1s;
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-decoration: none;
+}
+button:hover, .btn-link:hover { background: #444; color: #fff; }
+
+.btn-primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
+.btn-primary:hover { background: #08b2cb; opacity: 0.9; }
+
+.btn-neutral { background: #5a5a60; color: white; border-color: #777; font-weight: bold; }
+.btn-neutral:hover { background: #6f6f75; border-color: #888; }
+
+.btn-sq { width: 38px; height: 38px; padding: 0; }
+
+.btn-close { 
+    background: transparent; border: none; color: #666; font-size: 1.1rem; padding: 0 5px; cursor: pointer; 
+}
+.btn-close:hover { color: var(--danger); }
+
+/* Filters & Tabs */
+.filter-btn { border-radius: 20px; font-size: 0.8rem; background: transparent; color: #888; border: 1px solid #444; }
+.filter-btn:hover { border-color: #666; color: white; }
+.filter-btn.active { color: white; border-color: transparent; font-weight: bold; }
+
+.btn-all.active { background: var(--type-all); }
+.btn-combat.active { background: var(--type-combat); }
+.btn-territory.active { background: var(--type-territory); }
+.btn-crafting.active { background: var(--type-crafting); }
+
+#btnArenaShops.active { background: var(--success); color: white; border-color: var(--success); }
+#btnTechniquesLib.active { background: var(--accent); color: black; border-color: var(--accent); }
+#btnLib.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+/* === INPUTS === */
+input[type="text"], select { 
+    background: var(--bg-input); 
+    border: 1px solid var(--border); 
+    color: white; 
+    padding: 10px; 
+    width: 100%; 
+    border-radius: var(--radius); 
+}
+input:focus, select:focus { outline: none; border-color: #666; }
+
+/* === PANELS === */
+.tool-panel { 
+    background: var(--bg-panel); 
+    border: 1px solid var(--border); 
+    padding: 20px; 
+    margin-bottom: 20px; 
+    border-radius: var(--radius); 
+    border-top: 3px solid #333; 
+}
+.hidden { display: none !important; }
+
+/* === GRIDS & LAYOUTS === */
+.grid-cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
+
+.checkbox-grid { 
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; 
+    padding: 15px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius); 
+}
+.checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; padding: 4px; }
+.checkbox-item:hover { color: white; }
+.checkbox-item input { accent-color: var(--accent); transform: scale(1.1); }
+
+.header-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+
+.arena-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+@media (min-width: 1100px) { .arena-grid-layout { grid-template-columns: repeat(4, 1fr); } }
+
+/* === ARENA & TABLES === */
+.arena-card { 
+    background: var(--bg-card); 
+    border: 1px solid var(--border); 
+    border-top: 3px solid var(--success); 
+    border-radius: var(--radius); 
+    overflow: hidden; 
+}
+.arena-header { 
+    background: rgba(76, 175, 80, 0.05); 
+    padding: 8px 12px; 
+    font-weight: bold; 
+    color: #fff; 
+    border-bottom: 1px solid var(--border); 
+    font-size: 0.9rem; 
+}
+
+.arena-scroll {
+    max-height: 300px; 
+    overflow-y: auto;
+}
+.arena-scroll::-webkit-scrollbar { width: 6px; }
+.arena-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+.arena-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+.arena-scroll::-webkit-scrollbar-thumb:hover { background: #555; }
+
+.arena-table { width: 100%; border-collapse: collapse; }
+.arena-table td { 
+    padding: 4px 10px; 
+    border-bottom: 1px solid #333; 
+    font-size: 0.75rem; 
+    color: #ccc; 
+}
+.arena-table tr:last-child td { border-bottom: none; }
+
+.arena-table .arena-type {
+    font-size: 0.7rem;
+    font-style: italic;
+    color: #666;
+}
+
+.arena-table .arena-cost {
+    text-align: right; 
+    font-family: monospace; 
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; font-size: 0.85rem; }
+th { background: #252526; color: #e0e0e0; font-weight: 600; }
+tr:nth-child(even) { background-color: #1a1a1a; }
+tr:hover { background-color: #2a2a2a; }
+
+/* === UNIFIED CARD SYSTEM === */
+.uni-card {
+    background: #252526;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border-left: 4px solid #666; 
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.card-header.left-align { justify-content: flex-start; align-items: center; gap: 8px; }
+
+.card-title { font-weight: 700; font-size: 1rem; color: white; }
+.card-body { font-size: 0.85rem; color: #ccc; }
+.card-divider { height: 1px; background: #3e3e42; margin: 6px 0; }
+.card-risk { font-size: 0.8rem; color: var(--danger); margin-top: 4px; }
+
+.status-perfect { border-left-color: var(--success); }
+.status-good { border-left-color: var(--warning); }
+.status-risky { border-left-color: var(--danger); }
+.status-neutral { border-left-color: #666; }
+.status-crafting { border-left-color: var(--type-crafting); }
+.status-purple { border-left-color: var(--purple); }
+
+.gradient-card.status-perfect { background: linear-gradient(90deg, rgba(76, 175, 80, 0.1) 0%, transparent 100%); }
+.gradient-card.status-good { background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, transparent 100%); }
+.gradient-card.status-risky { background: linear-gradient(90deg, rgba(255, 82, 82, 0.1) 0%, transparent 100%); }
+
+.card-badge { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px; }
+.status-perfect .card-badge { color: var(--success); background: rgba(76, 175, 80, 0.15); }
+.status-good .card-badge { color: var(--warning); background: rgba(255, 193, 7, 0.15); }
+.status-risky .card-badge { color: var(--danger); background: rgba(255, 82, 82, 0.15); }
+.status-neutral .card-badge { color: #aaa; background: rgba(255,255,255,0.05); }
+.status-crafting .card-badge { color: var(--type-crafting); background: rgba(33, 150, 243, 0.15); }
+.badge-shop { background: #2e7d32; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-right: 5px; display: inline-block; cursor: help; }
+
+/* === SLOT BADGES === */
+/* Moved to slots_archive.js */
+
+/* === WARNING BADGE === */
+/* Moved to slots_archive.js */
+
+.tag-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; min-height: 72px; align-content: flex-start; }
+.uni-tag { font-size: 0.7rem; background: #333; padding: 2px 8px; border: 1px solid #444; color: #bbb; border-radius: 4px; cursor: help; }
+.uni-tag:hover { border-color: var(--accent); color: white; background: #444; }
+
+.donor-card { min-height: 110px; justify-content: space-between; }
+.donor-select-container { margin-top: auto; padding-top: 10px; }
+.donor-select { width: 100%; padding: 6px; background: #1a1a1a; font-size: 0.8rem; border: 1px solid #444; color: white; border-radius: 4px; }
+
+.trait-mini-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(191, 90, 242, 0.15); 
+    border: 1px solid var(--purple);
+    border-radius: 4px;
+    padding: 6px 12px;
+    margin: 0 5px 5px 0;
+    font-size: 0.9rem;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.trait-mini-card .remove-btn {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-left: 5px;
+    line-height: 1;
+}
+.trait-mini-card .remove-btn:hover {
+    opacity: 1;
+    color: #fff;
+}
+
+.tag-tech { border-color: rgba(0, 212, 241, 0.3); }
+.tag-tech:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 212, 241, 0.1); }
+
+.tag-trait { border-color: rgba(191, 90, 242, 0.3); }
+.tag-trait:hover { border-color: var(--purple); color: var(--purple); background: rgba(191, 90, 242, 0.1); }
+
+.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+.team-slot {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 15px; min-height: 140px; 
+    display: flex; flex-direction: column; cursor: pointer; border-left: 4px solid #555;
+    position: relative; transition: background 0.2s;
+}
+.team-slot:hover { background: #2a2a2a; }
+
+.team-slot.active-slot { 
+    border-left-color: #ffffff; 
+    background: #333333; 
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    border-top: 1px solid #555;
+    border-right: 1px solid #555;
+    border-bottom: 1px solid #555;
+}
+
+.empty-slot { border-left: 4px dashed #444; align-items: center; justify-content: center; color: #666; font-size: 2rem; }
+
+.input-with-dropdown { position: relative; flex: 1; }
+#traitInput { width: 100%; box-sizing: border-box; }
+.trait-dropdown {
+    position: absolute; top: 100%; left: 0; width: 100%;
+    background: #252526; border: 1px solid #444; border-top: none;
+    max-height: 200px; overflow-y: auto; z-index: 50;
+    border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;
+    display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.trait-option {
+    padding: 8px 12px; font-size: 0.9rem; color: #ccc; cursor: pointer; border-bottom: 1px solid #333;
+}
+.trait-option:hover { background: #333; color: white; }
+.trait-option span { color: #666; font-size: 0.8rem; margin-left: 5px; }
+
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px; }
+.compare-col { background: var(--bg-card); border: 1px solid var(--border); padding: 10px; border-radius: var(--radius); }
+.col-header { text-align: center; font-weight: bold; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; font-size: 0.9rem; color: white; }
+.skill-item { font-size: 0.8rem; padding: 4px 8px; background: #333; margin-bottom: 4px; text-align: center; border-radius: 4px; color: #ccc; cursor: help; }
+.skill-item:hover { background: #444; color: white; }
+.skill-shared { color: var(--accent); border: 1px solid rgba(0, 212, 241, 0.3); background: rgba(0, 212, 241, 0.05); }
+
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: var(--bg-panel); border: 1px solid var(--border); padding: 25px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; border-radius: var(--radius); }
+
+.close-modal { 
+    cursor: pointer; font-size: 1.2rem; color: #aaa; transition: all 0.2s; 
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    user-select: none;
+}
+.close-modal:hover { color: white; background: var(--danger); border-color: var(--danger); }
+
+#technique-tooltip {
+    position: absolute; background: #111; border: 1px solid #555; color: #ddd;
+    padding: 10px; font-size: 0.8rem; max-width: 280px; display: none; z-index: 1000;
+    pointer-events: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .team-grid, .compare-grid, .arena-grid-layout { grid-template-columns: 1fr; }
+    .header-actions { flex-direction: column; }
+    
+    .header-actions > div { 
+        flex-direction: row !important; 
+        justify-content: center;
+    }
+}
+
+}
