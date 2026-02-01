@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="Styles/styles.css">
     <script src="Scripts/script.js" defer></script>
     <script src="Scripts/team.js" defer></script>
-    </head>
+</head>
 <body>
 
 <div id="technique-tooltip"></div>
@@ -87,6 +87,14 @@
                 <button class="filter-btn" onclick="applyFilter('Animal', this)">Animal</button>
                 <button class="filter-btn" onclick="applyFilter('Furniture', this)">Furniture</button>
                 <button class="filter-btn" onclick="applyFilter('Variation', this)">Variations</button>
+                
+                <span style="color:#555; font-size:1.2rem; margin:0 5px; user-select:none; font-weight:300;">|</span>
+
+                <button class="filter-btn slot-btn active" onclick="applySlotFilter('All', this)">Slots</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(1, this)">1</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(2, this)">2</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(3, this)">3</button>
+                <button class="filter-btn slot-btn" onclick="applySlotFilter(4, this)">4</button>
             </div>
             <input type="text" id="searchTraits" placeholder="Search..." onkeyup="filterTraits()" style="max-width: 200px;">
         </div>
@@ -227,3 +235,4 @@ document.addEventListener('click', function(e) {
 
 </body>
 </html>
+
