@@ -1,8 +1,11 @@
 /* =========================================
-   CONFIGURATION
+   DYNAMIC CONFIGURATION (Defaults)
    ========================================= */
-const SHOW_SLOT_DATA = false;      // Set to false to hide all Slot (S1, S2...) UI elements
-const SHOW_BUILDER_MODULE = false; // Set to false to hide the "Custom Build Planner" panel entirely
+let SHOW_SLOT_DATA = false;
+let SHOW_BUILDER_MODULE = true;
+let SHOW_ISOLATION_MODULE = true;
+let SHOW_TECH_SEARCH_MODULE = true;
+let SHOW_DEV_SEARCH_MODULE = true;
 /* ========================================= */
 
 let deviations = [];
@@ -25,6 +28,55 @@ const builderDevSelect = document.getElementById('builderDevSelect');
 const techniqueSelect = document.getElementById('targetTechnique');
 const searchTechniqueSelect = document.getElementById('searchTechniqueSelect');
 const tooltip = document.getElementById('technique-tooltip');
+
+/* === SETTINGS LOGIC === */
+function toggleSettingsModal() {
+    document.getElementById('settingsModal').classList.toggle('hidden');
+}
+
+function toggleGlobalSetting(type) {
+    // 1. Update Boolean
+    if (type === 'SLOT') SHOW_SLOT_DATA = document.getElementById('chkSlotData').checked;
+    if (type === 'BUILDER') SHOW_BUILDER_MODULE = document.getElementById('chkBuilder').checked;
+    if (type === 'ISOLATION') SHOW_ISOLATION_MODULE = document.getElementById('chkIsolation').checked;
+    if (type === 'TECH_SEARCH') SHOW_TECH_SEARCH_MODULE = document.getElementById('chkTechSearch').checked;
+    if (type === 'DEV_SEARCH') SHOW_DEV_SEARCH_MODULE = document.getElementById('chkDevSearch').checked;
+
+    // 2. Apply Visibility Changes
+    applyVisibilitySettings();
+}
+
+function applyVisibilitySettings() {
+    // A. Toggle Panels
+    toggleDisplay('panel-builder', SHOW_BUILDER_MODULE);
+    toggleDisplay('panel-isolation', SHOW_ISOLATION_MODULE);
+    toggleDisplay('panel-tech-search', SHOW_TECH_SEARCH_MODULE);
+    toggleDisplay('panel-dev-search', SHOW_DEV_SEARCH_MODULE);
+
+    // B. Toggle Slot Data UI elements
+    const slotBtns = document.querySelectorAll('.slot-btn');
+    const separator = document.getElementById('slotFilterSep');
+    
+    if (SHOW_SLOT_DATA) {
+        slotBtns.forEach(btn => btn.style.display = '');
+        if(separator) separator.style.display = '';
+    } else {
+        slotBtns.forEach(btn => btn.style.display = 'none');
+        if(separator) separator.style.display = 'none';
+    }
+
+    // C. Re-render components that rely on Slot Data text
+    buildTraitsTable();   // Redraws the Trait Library table
+    generatePlan();       // Redraws the Planner results (to add/remove warnings)
+    renderSelectedTraits(); // Redraws selected traits in builder
+}
+
+function toggleDisplay(id, shouldShow) {
+    const el = document.getElementById(id);
+    if(el) el.style.display = shouldShow ? 'block' : 'none';
+}
+/* ====================== */
+
 
 function safeTooltip(str) {
     if (!str) return "No description";
@@ -73,6 +125,7 @@ async function init() {
         populateUI();
         renderDeviants(); 
         auditData(); 
+        applyVisibilitySettings(); // Ensure defaults are applied on load
     } catch (error) {
         console.error("Error loading data:", error);
     }
@@ -98,7 +151,7 @@ function filterTraitDropdown() {
             const div = document.createElement('div');
             div.className = 'trait-option';
             
-            // CONFIG: Only show slot text if enabled
+            // DYNAMIC: Only show slot text if enabled
             const slotStr = (SHOW_SLOT_DATA && t.slot) ? ` [S${t.slot}]` : '';
             
             div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
@@ -242,32 +295,6 @@ function populateUI() {
     buildTechniquesTable(); buildTraitsTable(); buildArenaShops();
     sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
     updateTechniques(); updateBuilderTechniques();
-
-    // CONFIG: Hide Slot UI buttons if disabled
-    if (!SHOW_SLOT_DATA) {
-        document.querySelectorAll('.slot-btn').forEach(btn => btn.style.display = 'none');
-        // Hide the separator text "|" if found before the buttons
-        const slotBtns = document.querySelectorAll('.slot-btn');
-        if(slotBtns.length > 0) {
-            const separator = slotBtns[0].previousElementSibling;
-            if(separator && separator.tagName === 'SPAN' && separator.innerHTML.includes('|')) {
-                separator.style.display = 'none';
-            }
-        }
-    }
-
-    // CONFIG: Hide Builder Module if disabled
-    if (!SHOW_BUILDER_MODULE) {
-        // Find the specific panel by its Header Text since it doesn't have a unique ID
-        const headers = document.querySelectorAll('h3');
-        for (const h3 of headers) {
-            if (h3.textContent.trim() === "Custom Build Planner") {
-                 const panel = h3.closest('.tool-panel');
-                 if(panel) panel.style.display = 'none';
-                 break;
-            }
-        }
-    }
 }
 
 function showTooltip(e, input) {
@@ -289,7 +316,7 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        // CONFIG: Only show badge if enabled
+        // DYNAMIC: Only show badge if enabled
         let slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
@@ -453,7 +480,7 @@ function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        // CONFIG: Only show badge if enabled
+        // DYNAMIC: Only show badge if enabled
         const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
 
         container.innerHTML += `
@@ -569,11 +596,11 @@ function generatePlan() {
         });
 
         userSelectedTraits.forEach(t => {
-            // CONFIG: Only show badge if enabled
+            // DYNAMIC: Only show badge if enabled
             const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge">S${t.slot}</span>` : '';
             
             let warningBadge = '';
-            // CONFIG: Only calculate warnings if enabled
+            // DYNAMIC: Only calculate warnings if enabled
             if (SHOW_SLOT_DATA && t.slot && slotCounts[t.slot] > 1) {
                 warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: Duplicate Slot ${t.slot}')" onmouseleave="hideTooltip()">!</span>`;
             }
