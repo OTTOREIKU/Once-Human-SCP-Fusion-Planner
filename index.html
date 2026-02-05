@@ -35,10 +35,15 @@
         </div>
         <div class="settings-list">
             <label class="setting-item">
-                <span>Show Slot Data (S1, S2...)</span>
-                <input type="checkbox" id="chkSlotData" onchange="toggleGlobalSetting('SLOT')" checked>
+                <div style="display:flex; flex-direction:column;">
+                    <span>Show Slot Data</span>
+                    <span style="font-size:0.75rem; color:#888; font-style:italic; margin-top:2px;">Slot data is a work in progress and may not be accurate</span>
+                </div>
+                <input type="checkbox" id="chkSlotData" onchange="toggleGlobalSetting('SLOT')">
             </label>
+            
             <div style="height:1px; background:#333; margin:10px 0;"></div>
+            
             <label class="setting-item">
                 <span>Show Custom Build Planner</span>
                 <input type="checkbox" id="chkBuilder" onchange="toggleGlobalSetting('BUILDER')" checked>
