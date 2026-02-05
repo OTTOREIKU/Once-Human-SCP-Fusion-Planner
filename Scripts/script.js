@@ -1,7 +1,8 @@
 /* =========================================
    CONFIGURATION
    ========================================= */
-const SHOW_SLOT_DATA = false; // Set to false to hide all Slot (S1, S2...) UI elements
+const SHOW_SLOT_DATA = false;      // Set to false to hide all Slot (S1, S2...) UI elements
+const SHOW_BUILDER_MODULE = false; // Set to false to hide the "Custom Build Planner" panel entirely
 /* ========================================= */
 
 let deviations = [];
@@ -97,7 +98,7 @@ function filterTraitDropdown() {
             const div = document.createElement('div');
             div.className = 'trait-option';
             
-            // TOGGLE: Only show slot text if enabled
+            // CONFIG: Only show slot text if enabled
             const slotStr = (SHOW_SLOT_DATA && t.slot) ? ` [S${t.slot}]` : '';
             
             div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
@@ -242,7 +243,7 @@ function populateUI() {
     sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
     updateTechniques(); updateBuilderTechniques();
 
-    // TOGGLE: Hide Slot UI buttons if disabled
+    // CONFIG: Hide Slot UI buttons if disabled
     if (!SHOW_SLOT_DATA) {
         document.querySelectorAll('.slot-btn').forEach(btn => btn.style.display = 'none');
         // Hide the separator text "|" if found before the buttons
@@ -251,6 +252,19 @@ function populateUI() {
             const separator = slotBtns[0].previousElementSibling;
             if(separator && separator.tagName === 'SPAN' && separator.innerHTML.includes('|')) {
                 separator.style.display = 'none';
+            }
+        }
+    }
+
+    // CONFIG: Hide Builder Module if disabled
+    if (!SHOW_BUILDER_MODULE) {
+        // Find the specific panel by its Header Text since it doesn't have a unique ID
+        const headers = document.querySelectorAll('h3');
+        for (const h3 of headers) {
+            if (h3.textContent.trim() === "Custom Build Planner") {
+                 const panel = h3.closest('.tool-panel');
+                 if(panel) panel.style.display = 'none';
+                 break;
             }
         }
     }
@@ -275,7 +289,7 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        // TOGGLE: Only show badge if enabled
+        // CONFIG: Only show badge if enabled
         let slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
@@ -439,7 +453,7 @@ function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        // TOGGLE: Only show badge if enabled
+        // CONFIG: Only show badge if enabled
         const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
 
         container.innerHTML += `
@@ -555,11 +569,11 @@ function generatePlan() {
         });
 
         userSelectedTraits.forEach(t => {
-            // TOGGLE: Only show badge if enabled
+            // CONFIG: Only show badge if enabled
             const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge">S${t.slot}</span>` : '';
             
             let warningBadge = '';
-            // TOGGLE: Only calculate warnings if enabled
+            // CONFIG: Only calculate warnings if enabled
             if (SHOW_SLOT_DATA && t.slot && slotCounts[t.slot] > 1) {
                 warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: Duplicate Slot ${t.slot}')" onmouseleave="hideTooltip()">!</span>`;
             }
@@ -646,4 +660,3 @@ function generateShareCode() {
 }
 
 init();
-
