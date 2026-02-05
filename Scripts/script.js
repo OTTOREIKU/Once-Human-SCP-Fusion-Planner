@@ -272,8 +272,56 @@ function updateComparison() {
     `;
 }
 
-function auditData() { const techDefinitions = new Set(techniquesData.map(t => t.name)); deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) console.warn(`Missing definition: "${tech}"`); }); }); }
-function openDataModal() { const modal = document.getElementById('dataSyncModal'); const statusDiv = document.getElementById('dataSyncStatus'); modal.classList.remove('hidden'); const techDefinitions = new Set(techniquesData.map(t => t.name)); let missingTechCount = 0; let html = ""; deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) { missingTechCount++; html += `<div style="font-size:0.85rem; padding:4px 0; border-bottom:1px dotted #333;"><span style="color:var(--danger)">MISSING:</span> ${tech} (${dev.name})</div>`; } }); }); let missingPsi = 0; let missingPassive = 0; deviations.forEach(dev => { if (!dev.psi || dev.psi === "Data needed") missingPsi++; if (!dev.passive || dev.passive === "Data needed") missingPassive++; }); statusDiv.innerHTML = missingTechCount === 0 ? `<h4 style="color:var(--success);">✅ Core Data Synced Successfully!</h4>` : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; statusDiv.innerHTML += `<div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;"><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div><div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;"><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div></div></div>`; }
+function auditData() { 
+    const techDefinitions = new Set(techniquesData.map(t => t.name)); 
+    let missingTechCount = 0; 
+    let html = ""; 
+
+    deviations.forEach(dev => { 
+        dev.techniques.forEach(tech => { 
+            if (!techDefinitions.has(tech)) { 
+                missingTechCount++; 
+                html += `<div style="font-size:0.85rem; padding:4px 0; border-bottom:1px dotted #333;"><span style="color:var(--danger)">MISSING:</span> ${tech} (${dev.name})</div>`; 
+            } 
+        }); 
+    }); 
+
+    let missingPsi = 0; 
+    let missingPassive = 0; 
+    let missingStandard = 0;
+
+    deviations.forEach(dev => { 
+        if (!dev.psi || dev.psi === "Data needed") missingPsi++; 
+        if (!dev.passive || dev.passive === "Data needed") missingPassive++; 
+        // NEW: Check for Standard
+        if (!dev.standard || dev.standard === "Data needed") missingStandard++;
+    }); 
+
+    const statusDiv = document.getElementById('dataSyncStatus');
+    
+    statusDiv.innerHTML = missingTechCount === 0 
+        ? `<h4 style="color:var(--success);">Core Data Synced Successfully!</h4>` 
+        : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; 
+    
+    // UPDATED: Added Standard Data Missing Stats
+    statusDiv.innerHTML += `
+    <div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;">
+        <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div>
+        <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div>
+        <div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div>
+        <div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;">
+            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div>
+            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div>
+            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Standard Data Missing:</span> <strong>${missingStandard} / ${deviations.length}</strong></div>
+        </div>
+    </div>`; 
+}
+
+function openDataModal() { 
+    document.getElementById('dataSyncModal').classList.remove('hidden'); 
+    auditData(); // Re-run audit when opening to ensure stats are fresh
+}
+
 function closeDataModal() { document.getElementById('dataSyncModal').classList.add('hidden'); }
 
 function populateUI() {
@@ -295,6 +343,31 @@ function populateUI() {
     buildTechniquesTable(); buildTraitsTable(); buildArenaShops();
     sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
     updateTechniques(); updateBuilderTechniques();
+
+    // CONFIG: Hide Slot UI buttons if disabled
+    if (!SHOW_SLOT_DATA) {
+        document.querySelectorAll('.slot-btn').forEach(btn => btn.style.display = 'none');
+        // Hide the separator text "|" if found before the buttons
+        const slotBtns = document.querySelectorAll('.slot-btn');
+        if(slotBtns.length > 0) {
+            const separator = slotBtns[0].previousElementSibling;
+            if(separator && separator.tagName === 'SPAN' && separator.innerHTML.includes('|')) {
+                separator.style.display = 'none';
+            }
+        }
+    }
+
+    // CONFIG: Hide Builder Module if disabled
+    if (!SHOW_BUILDER_MODULE) {
+        const headers = document.querySelectorAll('h3');
+        for (const h3 of headers) {
+            if (h3.textContent.trim() === "Custom Build Planner") {
+                 const panel = h3.closest('.tool-panel');
+                 if(panel) panel.style.display = 'none';
+                 break;
+            }
+        }
+    }
 }
 
 function showTooltip(e, input) {
@@ -398,8 +471,13 @@ function renderDeviants() {
             let passDesc = dev.passive || "Data needed";
             if(passDesc.includes(':')) passDesc = passDesc.split(/:(.*)/s)[1].trim();
             
+            // NEW: Standard Data Handling
+            let stdDesc = dev.standard || "Data needed";
+            if(stdDesc.includes(':')) stdDesc = stdDesc.split(/:(.*)/s)[1].trim();
+
             const psiStr = (dev.psi && dev.psi !== "Data needed") ? dev.psi.split(':')[0] : "-";
             const passStr = (dev.passive && dev.passive !== "Data needed") ? dev.passive.split(':')[0] : "-";
+            const stdStr = (dev.standard && dev.standard !== "Data needed") ? dev.standard.split(':')[0] : "-";
 
             container.innerHTML += `
                 <div class="uni-card ${status}">
@@ -413,6 +491,10 @@ function renderDeviants() {
                     <div class="card-body">
                         <div style="margin-bottom:4px; cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(psiDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">PSI:</strong> ${psiStr}</div>
                         <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(passDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Passive:</strong> ${passStr}</div>
+                        
+                        <div style="height:1px; background:#3e3e42; margin:6px 0; border-top:1px dashed #555;"></div>
+                        
+                        <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(stdDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Standard:</strong> ${stdStr}</div>
                     </div>
                 </div>`;
         }
