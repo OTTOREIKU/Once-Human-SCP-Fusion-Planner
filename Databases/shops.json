@@ -3,6 +3,7 @@
     "arena": "Verdant Arena",
     "items": [
       {"name": "Chaos Extradimensional Cat", "type": "Species Code", "cost": 300},
+      {"name": "Doctor Raven", "type": "Species Code", "cost": 120},
       {"name": "Extradimensional Cat", "type": "Species Code", "cost": 120},
       {"name": "Harveseed", "type": "Species Code", "cost": 120},
       {"name": "Zapamander", "type": "Species Code", "cost": 120},
@@ -127,4 +128,5 @@
     ]
   }
 ]
+
 
