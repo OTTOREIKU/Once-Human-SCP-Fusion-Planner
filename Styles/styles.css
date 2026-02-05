@@ -356,6 +356,36 @@ tr:hover { background-color: #2a2a2a; }
 }
 .close-modal:hover { color: white; background: var(--danger); border-color: var(--danger); }
 
+/* Settings List Styles */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #252526;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+.setting-item:hover {
+    background: #2d2d30;
+    border-color: #666;
+}
+.setting-item span {
+    font-size: 0.9rem;
+    color: #e0e0e0;
+}
+.setting-item input[type="checkbox"] {
+    width: auto;
+    transform: scale(1.2);
+    accent-color: var(--accent);
+}
+
 #technique-tooltip {
     position: absolute; background: #111; border: 1px solid #555; color: #ddd;
     padding: 10px; font-size: 0.8rem; max-width: 280px; display: none; z-index: 1000;
