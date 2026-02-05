@@ -45,6 +45,10 @@
      "psi":"Beast Summon: Summon all 3 animals and fully restore their HP.",
      "passive":"Efficient Breeding: All allies within range receive a 3% healing boost for a short time.",
      "techniques":["Animal Expert","Group Physical Enhancement","Healing Aura","Healing Bullet","Healing Link","Psi Bullet"]},
+    {"name":"Doctor Raven","type":"Territory",
+     "psi":"Lethal Surgery: Designate a target to put them in a surgical state, rendering them immobile. During the surgery, the HP percentages of the target and Doctor Raven are swapped.",
+     "passive":"Plague: Each time you receive healing, release a plague on all nearby enemies, reducing their HP by 0.3% per second for 5 seconds.",
+     "techniques":["Chrysalis","Damage Link","Healing Link","Provoke","Rite of Strength","Savage Strike"]},
     {"name":"Dr-Teddy","type":"Combat",
      "psi":"Panacea: Transforms into a giant bear, healing surrounding allies every 0.5s for 180% of his Attack, 6 times in total. Consumes 400 Psi Energy.",
      "passive":"Healer's Heart: When healing other targets, restores 20% of the healing amount to self.",
@@ -216,3 +220,4 @@
      "passive":"Warrior's Heart: Each successful hit increases Crit Rate by 2%, stacking up to 20 times.",
      "techniques":["Blink","Cyclone","Dodge","Shadow Strike","Sweep","Whirlwind Slash"]}
 ]
+
