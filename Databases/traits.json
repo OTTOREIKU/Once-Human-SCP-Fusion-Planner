@@ -43,7 +43,7 @@
 
   {"name": "Anti-Burnout", "description": "When dormant (regaining Power), 20% chance others receive Power +5", "category": "Territory", "type": "positive", "source": "Territory Deviation", "slot": 2},
   {"name": "Dream Wild", "description": "When dormant (regaining Power), 10% chance others receive Power +10", "category": "Territory", "type": "positive", "source": "Territory Deviation", "slot": 2},
-  {"name": "A World of Charm", "description": "When dormant (regaining Mood), 10% chance others receive Mood +20", "category": "Territory", "type": "positive", "source": "Territory Deviation", "slot": 2},
+  {"name": "A World of Charm", "description": "When dormant (regaining Mood), 10% chance others receive Mood +20", "category": "Territory", "type": "positive", "source": "Territory Deviation", "slot": },
   {"name": "Sweet Talk", "description": "When dormant (regaining Mood), 20% chance others receive Mood +5", "category": "Territory", "type": "positive", "source": "Territory Deviation", "slot": 2},
   {"name": "Hydrophilic", "description": "When resting by water, Energy Recovery Speed +30%", "category": "Territory", "type": "positive", "source": "Territory Deviation", "slot": 2},
   {"name": "Devoted laborer", "description": "Mood and Power consumption speed +20% (Works 20% faster)", "category": "Territory", "type": "mixed", "source": "Territory Deviation", "slot": 2},
@@ -206,3 +206,4 @@
   {"name": "Aberrant Progeny", "description": "Player damage taken is reduced by 15%, with 50% more effect while in Pollution Zones.", "category": "Variation", "type": "variation", "source": "Dr. Teddy", "slot": 2},
   {"name": "Aberrant Progeny", "description": "Has a 30% chance of yielding +1 resource when in a Pollution Zone.", "category": "Variation", "type": "variation", "source": "Upper World Spawn", "slot": 2}
 ]
+
