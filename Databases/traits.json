@@ -206,3 +206,6 @@
   {"name": "Aberrant Progeny", "description": "Player damage taken is reduced by 15%, with 50% more effect while in Pollution Zones.", "category": "Variation", "type": "variation", "source": "Dr. Teddy", "slot": 2},
   {"name": "Aberrant Progeny", "description": "Has a 30% chance of yielding +1 resource when in a Pollution Zone.", "category": "Variation", "type": "variation", "source": "Upper World Spawn", "slot": 2}
 ]
+
+
+

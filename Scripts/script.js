@@ -1,3 +1,9 @@
+/* =========================================
+   CONFIGURATION
+   ========================================= */
+const SHOW_SLOT_DATA = false; // Set to false to hide all Slot (S1, S2...) UI elements
+/* ========================================= */
+
 let deviations = [];
 let traits = [];
 let techniquesData = []; 
@@ -90,7 +96,10 @@ function filterTraitDropdown() {
         matches.slice(0, 10).forEach(t => {
             const div = document.createElement('div');
             div.className = 'trait-option';
-            const slotStr = t.slot ? ` [S${t.slot}]` : '';
+            
+            // TOGGLE: Only show slot text if enabled
+            const slotStr = (SHOW_SLOT_DATA && t.slot) ? ` [S${t.slot}]` : '';
+            
             div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
             div.onclick = () => selectTraitFromDropdown(t.name, t.source);
             dropdown.appendChild(div);
@@ -232,6 +241,19 @@ function populateUI() {
     buildTechniquesTable(); buildTraitsTable(); buildArenaShops();
     sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
     updateTechniques(); updateBuilderTechniques();
+
+    // TOGGLE: Hide Slot UI buttons if disabled
+    if (!SHOW_SLOT_DATA) {
+        document.querySelectorAll('.slot-btn').forEach(btn => btn.style.display = 'none');
+        // Hide the separator text "|" if found before the buttons
+        const slotBtns = document.querySelectorAll('.slot-btn');
+        if(slotBtns.length > 0) {
+            const separator = slotBtns[0].previousElementSibling;
+            if(separator && separator.tagName === 'SPAN' && separator.innerHTML.includes('|')) {
+                separator.style.display = 'none';
+            }
+        }
+    }
 }
 
 function showTooltip(e, input) {
@@ -253,7 +275,8 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        let slotBadge = t.slot ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
+        // TOGGLE: Only show badge if enabled
+        let slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
         <tr data-category="${t.category}" data-slot="${t.slot || 'none'}">
@@ -416,7 +439,8 @@ function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        const slotBadge = t.slot ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
+        // TOGGLE: Only show badge if enabled
+        const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
 
         container.innerHTML += `
             <div class="trait-mini-card">
@@ -531,11 +555,13 @@ function generatePlan() {
         });
 
         userSelectedTraits.forEach(t => {
-            const slotBadge = t.slot ? `<span class="slot-badge">S${t.slot}</span>` : '';
+            // TOGGLE: Only show badge if enabled
+            const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge">S${t.slot}</span>` : '';
             
             let warningBadge = '';
-            if (t.slot && slotCounts[t.slot] > 1) {
-                warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: duplicate slot detected, you can only have one trait from each slot on the deviation')" onmouseleave="hideTooltip()">!</span>`;
+            // TOGGLE: Only calculate warnings if enabled
+            if (SHOW_SLOT_DATA && t.slot && slotCounts[t.slot] > 1) {
+                warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: Duplicate Slot ${t.slot}')" onmouseleave="hideTooltip()">!</span>`;
             }
 
             html += `
@@ -620,3 +646,4 @@ function generateShareCode() {
 }
 
 init();
+
