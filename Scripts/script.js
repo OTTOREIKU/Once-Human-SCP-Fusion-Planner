@@ -1,7 +1,7 @@
 /* =========================================
    CONFIGURATION
    ========================================= */
-const SHOW_SLOT_DATA = true; // Set to FALSE to hide all Slot (S1, S2...) UI elements
+const SHOW_SLOT_DATA = false; // Set to false to hide all Slot (S1, S2...) UI elements
 /* ========================================= */
 
 let deviations = [];
@@ -646,3 +646,4 @@ function generateShareCode() {
 }
 
 init();
+
