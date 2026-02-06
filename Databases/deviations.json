@@ -154,7 +154,7 @@
     {"name":"Mini Wonder","type":"Combat",
      "psi":"Blackhole Jet: Creates a black hole at the enemy's location for 11s, continuously pulling in hostile units within 17m and dealing 208.30% SP.ATK DMG every 1.2s. Consumes 500 Psi Energy.",
      "passive":"Gravitas: After casting the skill, generates a Gravity Orb nearby every 20s, lasting 6s. Automatically absorbs bullets and projectiles within 3m.",
-     "techniques":["Blackhole Jet","Elemental Overload","Lightning","Pulse Orb","Space Twister"]},
+     "techniques":["Blackhole Jet","Elemental Overload","Lightning","Pulse Orb","Pulse Ray","Space Twister"]},
     {"name":"Mr Wish","type":"Combat",
      "psi":"Coin Fire: Flips the coin of fate 6 times in a row, letting luck decide the outcome. Consumes 400 Psi Energy.",
      "passive":"Big Winner: Increases the success rate of all probability-based skills by 15%.",
@@ -248,3 +248,4 @@
      "passive":"Warrior's Heart: Each successful hit increases Crit Rate by 2%, stacking up to 20 times.",
      "techniques":["Blink","Cyclone","Dodge","Shadow Strike","Sweep","Whirlwind Slash"]}
 ]
+
