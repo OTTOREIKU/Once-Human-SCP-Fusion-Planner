@@ -1,7 +1,7 @@
 /* =========================================
    DYNAMIC CONFIGURATION (Defaults)
    ========================================= */
-let SHOW_SLOT_DATA = false;  // UPDATED: Default is now FALSE
+let SHOW_SLOT_DATA = false;  // Default is now FALSE
 let SHOW_BUILDER_MODULE = true;
 let SHOW_ISOLATION_MODULE = true;
 let SHOW_TECH_SEARCH_MODULE = true;
@@ -35,25 +35,21 @@ function toggleSettingsModal() {
 }
 
 function toggleGlobalSetting(type) {
-    // 1. Update Boolean
     if (type === 'SLOT') SHOW_SLOT_DATA = document.getElementById('chkSlotData').checked;
     if (type === 'BUILDER') SHOW_BUILDER_MODULE = document.getElementById('chkBuilder').checked;
     if (type === 'ISOLATION') SHOW_ISOLATION_MODULE = document.getElementById('chkIsolation').checked;
     if (type === 'TECH_SEARCH') SHOW_TECH_SEARCH_MODULE = document.getElementById('chkTechSearch').checked;
     if (type === 'DEV_SEARCH') SHOW_DEV_SEARCH_MODULE = document.getElementById('chkDevSearch').checked;
 
-    // 2. Apply Visibility Changes
     applyVisibilitySettings();
 }
 
 function applyVisibilitySettings() {
-    // A. Toggle Panels
     toggleDisplay('panel-builder', SHOW_BUILDER_MODULE);
     toggleDisplay('panel-isolation', SHOW_ISOLATION_MODULE);
     toggleDisplay('panel-tech-search', SHOW_TECH_SEARCH_MODULE);
     toggleDisplay('panel-dev-search', SHOW_DEV_SEARCH_MODULE);
 
-    // B. Toggle Slot Data UI elements
     const slotBtns = document.querySelectorAll('.slot-btn');
     const separator = document.getElementById('slotFilterSep');
     
@@ -65,10 +61,9 @@ function applyVisibilitySettings() {
         if(separator) separator.style.display = 'none';
     }
 
-    // C. Re-render components that rely on Slot Data text
-    buildTraitsTable();   // Redraws the Trait Library table
-    generatePlan();       // Redraws the Planner results (to add/remove warnings)
-    renderSelectedTraits(); // Redraws selected traits in builder
+    buildTraitsTable();   
+    generatePlan();       
+    renderSelectedTraits(); 
 }
 
 function toggleDisplay(id, shouldShow) {
@@ -125,7 +120,7 @@ async function init() {
         populateUI();
         renderDeviants(); 
         auditData(); 
-        applyVisibilitySettings(); // Ensure defaults are applied on load
+        applyVisibilitySettings(); 
     } catch (error) {
         console.error("Error loading data:", error);
     }
@@ -150,10 +145,7 @@ function filterTraitDropdown() {
         matches.slice(0, 10).forEach(t => {
             const div = document.createElement('div');
             div.className = 'trait-option';
-            
-            // DYNAMIC: Only show slot text if enabled
             const slotStr = (SHOW_SLOT_DATA && t.slot) ? ` [S${t.slot}]` : '';
-            
             div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
             div.onclick = () => selectTraitFromDropdown(t.name, t.source);
             dropdown.appendChild(div);
@@ -288,23 +280,20 @@ function auditData() {
 
     let missingPsi = 0; 
     let missingPassive = 0; 
-    let missingStandard = 0; // NEW: Track Missing Standard Data
+    let missingStandard = 0; 
 
     deviations.forEach(dev => { 
         if (!dev.psi || dev.psi === "Data needed") missingPsi++; 
         if (!dev.passive || dev.passive === "Data needed") missingPassive++; 
-        // NEW: Check for Standard
         if (!dev.standard || dev.standard === "Data needed") missingStandard++;
     }); 
 
     const statusDiv = document.getElementById('dataSyncStatus');
     
-    // UPDATED: Removed Checkmark Icon from success message
     statusDiv.innerHTML = missingTechCount === 0 
         ? `<h4 style="color:var(--success);">Core Data Synced Successfully!</h4>` 
         : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; 
     
-    // UPDATED: Added Standard Data Missing Stats
     statusDiv.innerHTML += `
     <div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;">
         <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div>
@@ -320,7 +309,7 @@ function auditData() {
 
 function openDataModal() { 
     document.getElementById('dataSyncModal').classList.remove('hidden'); 
-    auditData(); // Re-run audit when opening to ensure stats are fresh
+    auditData(); 
 }
 
 function closeDataModal() { document.getElementById('dataSyncModal').classList.add('hidden'); }
@@ -345,10 +334,8 @@ function populateUI() {
     sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
     updateTechniques(); updateBuilderTechniques();
 
-    // CONFIG: Hide Slot UI buttons if disabled
     if (!SHOW_SLOT_DATA) {
         document.querySelectorAll('.slot-btn').forEach(btn => btn.style.display = 'none');
-        // Hide the separator text "|" if found before the buttons
         const slotBtns = document.querySelectorAll('.slot-btn');
         if(slotBtns.length > 0) {
             const separator = slotBtns[0].previousElementSibling;
@@ -358,7 +345,6 @@ function populateUI() {
         }
     }
 
-    // CONFIG: Hide Builder Module if disabled
     if (!SHOW_BUILDER_MODULE) {
         const headers = document.querySelectorAll('h3');
         for (const h3 of headers) {
@@ -390,7 +376,6 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        // DYNAMIC: Only show badge if enabled
         let slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
@@ -472,7 +457,6 @@ function renderDeviants() {
             let passDesc = dev.passive || "Data needed";
             if(passDesc.includes(':')) passDesc = passDesc.split(/:(.*)/s)[1].trim();
             
-            // NEW: Standard Data Handling
             let stdDesc = dev.standard || "Data needed";
             if(stdDesc.includes(':')) stdDesc = stdDesc.split(/:(.*)/s)[1].trim();
 
@@ -480,7 +464,6 @@ function renderDeviants() {
             const passStr = (dev.passive && dev.passive !== "Data needed") ? dev.passive.split(':')[0] : "-";
             const stdStr = (dev.standard && dev.standard !== "Data needed") ? dev.standard.split(':')[0] : "-";
 
-            // UPDATED: Replaced inline style separator with "card-divider" class to match user request
             container.innerHTML += `
                 <div class="uni-card ${status}">
                     <div class="card-header"><span class="card-title">${dev.name}</span><span class="card-badge">${dev.type}</span></div>
@@ -494,9 +477,7 @@ function renderDeviants() {
                         <div style="margin-bottom:4px; cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(psiDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">PSI:</strong> ${psiStr}</div>
                         <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(passDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Passive:</strong> ${passStr}</div>
                         
-                        <div class="card-divider"></div>
-                        
-                        <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(stdDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Standard:</strong> ${stdStr}</div>
+                        <div style="cursor:help; margin-top:4px; padding-top:4px;" onmouseenter="showTooltip(event, '${safeTooltip(stdDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Standard:</strong> ${stdStr}</div>
                     </div>
                 </div>`;
         }
