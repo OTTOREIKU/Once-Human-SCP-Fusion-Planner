@@ -1,7 +1,7 @@
 /* =========================================
    DYNAMIC CONFIGURATION (Defaults)
    ========================================= */
-let SHOW_SLOT_DATA = false;
+let SHOW_SLOT_DATA = false;  // UPDATED: Default is now FALSE
 let SHOW_BUILDER_MODULE = true;
 let SHOW_ISOLATION_MODULE = true;
 let SHOW_TECH_SEARCH_MODULE = true;
@@ -288,7 +288,7 @@ function auditData() {
 
     let missingPsi = 0; 
     let missingPassive = 0; 
-    let missingStandard = 0;
+    let missingStandard = 0; // NEW: Track Missing Standard Data
 
     deviations.forEach(dev => { 
         if (!dev.psi || dev.psi === "Data needed") missingPsi++; 
@@ -299,6 +299,7 @@ function auditData() {
 
     const statusDiv = document.getElementById('dataSyncStatus');
     
+    // UPDATED: Removed Checkmark Icon from success message
     statusDiv.innerHTML = missingTechCount === 0 
         ? `<h4 style="color:var(--success);">Core Data Synced Successfully!</h4>` 
         : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; 
@@ -479,6 +480,7 @@ function renderDeviants() {
             const passStr = (dev.passive && dev.passive !== "Data needed") ? dev.passive.split(':')[0] : "-";
             const stdStr = (dev.standard && dev.standard !== "Data needed") ? dev.standard.split(':')[0] : "-";
 
+            // UPDATED: Replaced inline style separator with "card-divider" class to match user request
             container.innerHTML += `
                 <div class="uni-card ${status}">
                     <div class="card-header"><span class="card-title">${dev.name}</span><span class="card-badge">${dev.type}</span></div>
@@ -492,7 +494,7 @@ function renderDeviants() {
                         <div style="margin-bottom:4px; cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(psiDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">PSI:</strong> ${psiStr}</div>
                         <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(passDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Passive:</strong> ${passStr}</div>
                         
-                        <div style="height:1px; background:#3e3e42; margin:6px 0; border-top:1px dashed #555;"></div>
+                        <div class="card-divider"></div>
                         
                         <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(stdDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Standard:</strong> ${stdStr}</div>
                     </div>
