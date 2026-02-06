@@ -2,7 +2,7 @@
     {"name":"Artisan's Hand","type":"Crafting",
      "psi":"HP Recovery: Restores all allies' HP to their state from 5s ago.",
      "passive":"Complete Repair: Increases Max HP by 2% every time healing is received, up to 20%.",
-     "techniques":[]},
+     "techniques":["Damage Link","Healing Aura","Rapid Charge","Savage Strike","Self-Healing","Whirlwind Slash"]},
     {"name":"Atomic Lighter","type":"Crafting",
      "psi":"Atomic Apocalypse: Continuously approaches the target, triggering a nuclear explosion after 5s that deals 2,040.3% AoE SP.ATK DMG. Consumes 350 Psi Energy.",
      "passive":"Kindling: Upon Death, increases Attack of all remaining allied Deviations on the battlefield by 150% for 8s.",
@@ -27,7 +27,10 @@
      "psi":"Cat Gathering: The cat dispels all negative states from allies and boosts their P.ATK and SP.ATK by 158.7% for 10s. Consumes 450 Psi Energy.",
      "passive":"Cat's Virtues: When the cat buffs allies, restores HP equal to 3% of its own Max HP.",
      "techniques":["Charging Aura","Heavy Pressure","Kitty Punch","Rapid Charge","Rush","Sweep"]},
-    {"name":"Chaos Mr Wish","type":"Combat","psi":"Data needed","passive":"Data needed","techniques":["Fate Coin","Rapid Fire","Resonant Skybound","Self-Recharge","Space Twister","Weakspot Sniper"]},
+    {"name":"Chaos Mr Wish","type":"Combat",
+     "psi":"Coin Fire: Flips the coin of fate 6 times in a row, letting luck decide the outcome. Consumes 400 Psi Energy.",
+     "passive":"Big Winner: Increases the success rate of all probability-based skills by 15%.",
+     "techniques":["Fate Coin","Rapid Fire","Resonant Skybound","Self-Recharge","Space Twister","Weakspot Sniper"]},   
     {"name":"Chaosaurus","type":"Combat",
      "psi":"Pyro Dino Bombardment: Combines Telekinetic Hand with Pyro Dino magic, causing the Pyro Dino to spew explosive flame orbs at enemies. Consumes 600 Psi Energy.",
      "passive":"Flame Queen: Gains +80% SP.ATK DMG for 3s when attacking Burned units.",
@@ -242,3 +245,4 @@
      "passive":"Warrior's Heart: Each successful hit increases Crit Rate by 2%, stacking up to 20 times.",
      "techniques":["Blink","Cyclone","Dodge","Shadow Strike","Sweep","Whirlwind Slash"]}
 ]
+
