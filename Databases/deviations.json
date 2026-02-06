@@ -30,7 +30,7 @@
     {"name":"Chaos Mr Wish","type":"Combat",
      "psi":"Coin Fire: Flips the coin of fate 6 times in a row, letting luck decide the outcome. Consumes 400 Psi Energy.",
      "passive":"Big Winner: Increases the success rate of all probability-based skills by 15%.",
-     "techniques":["Fate Coin","Rapid Fire","Resonant Skybound","Self-Recharge","Space Twister","Weakspot Sniper"]},   
+     "techniques":["Fate Coin","Rapid Fire","Resonant Skybound","Self-Recharge","Space Twister","Weakspot Sniper"]},
     {"name":"Chaosaurus","type":"Combat",
      "psi":"Pyro Dino Bombardment: Combines Telekinetic Hand with Pyro Dino magic, causing the Pyro Dino to spew explosive flame orbs at enemies. Consumes 600 Psi Energy.",
      "passive":"Flame Queen: Gains +80% SP.ATK DMG for 3s when attacking Burned units.",
@@ -235,7 +235,10 @@
      "psi":"Underwater World: Enter the underwater world for 10s. Every 5s, all enemies within a 25m radius are trapped in the water prison, triggering twice in total. The water prison lasts 4s before exploding, dealing 259.5% SP.ATK DMG. Consumes 400 Psi Energy.",
      "passive":"Water Prison: When dealing damage, suspends the target in a water prison for 3s. Can only trigger once on the same target within 10s. When the water prison expires, it explodes, dealing SP.ATK DMG equal to 70% of Attack to the target.",
      "techniques":["Cryo Bullet","Frost Vortex","Ice Crystal Ambush","Resist Death","Shield","Whale Invasion"]},
-    {"name":"ZapCam","type":"Combat","psi":"Data needed","passive":"Data needed","techniques":["Dodge","Healing","Psi Ray","Rapid Fire","Weakspot Sniper","Wild Shot"]},
+    {"name":"ZapCam","type":"Combat",
+     "psi":"Frozen Vision: Possesses the player to scan enemies for 5s. After 5s, deals 692% P.ATK DMG to all locked targets. Each lock and DMG instance increases all of the target's skill cooldowns by 3s. Prioritizes locking different enemies. Consumes 450 Psi Energy.",
+     "passive":"Follow Shot: Locked target takes 13.3% increased damage.",
+     "techniques":["Dodge","Healing","Psi Ray","Rapid Fire","Weakspot Sniper","Wild Shot"]},
     {"name":"Zapamander","type":"Combat",
      "psi":"Thunder's Wrath: Zapamander summons lightning to strike all enemies within a 20m radius, dealing 773.3% SP.ATK DMG. For each stack of Power Surge on the target, this damage increases by 10%.",
      "passive":"Static Field: Each time a battle skill is cast, deals true damage equal to 0.14% of Max HP to all enemies within a 12m radius.",
@@ -245,4 +248,3 @@
      "passive":"Warrior's Heart: Each successful hit increases Crit Rate by 2%, stacking up to 20 times.",
      "techniques":["Blink","Cyclone","Dodge","Shadow Strike","Sweep","Whirlwind Slash"]}
 ]
-
