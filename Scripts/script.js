@@ -1,7 +1,7 @@
 /* =========================================
    DYNAMIC CONFIGURATION (Defaults)
    ========================================= */
-let SHOW_SLOT_DATA = false;  // Default is now FALSE
+let SHOW_SLOT_DATA = false;
 let SHOW_BUILDER_MODULE = true;
 let SHOW_ISOLATION_MODULE = true;
 let SHOW_TECH_SEARCH_MODULE = true;
@@ -294,17 +294,26 @@ function auditData() {
         ? `<h4 style="color:var(--success);">Core Data Synced Successfully!</h4>` 
         : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; 
     
-    statusDiv.innerHTML += `
+    // UPDATED LOGIC: Only generate HTML for categories that have missing data
+    let missingReport = "";
+    if (missingPsi > 0) missingReport += `<div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div>`;
+    if (missingPassive > 0) missingReport += `<div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div>`;
+    if (missingStandard > 0) missingReport += `<div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Standard Data Missing:</span> <strong>${missingStandard} / ${deviations.length}</strong></div>`;
+
+    let detailSection = `
     <div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;">
         <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div>
         <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div>
-        <div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div>
-        <div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;">
-            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div>
-            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div>
-            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Standard Data Missing:</span> <strong>${missingStandard} / ${deviations.length}</strong></div>
-        </div>
-    </div>`; 
+        <div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div>`;
+    
+    // Only append the divider and missing report if there is actually something missing
+    if (missingReport !== "") {
+        detailSection += `<div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;">${missingReport}</div>`;
+    }
+    
+    detailSection += `</div>`;
+
+    statusDiv.innerHTML += detailSection;
 }
 
 function openDataModal() { 
