@@ -25,7 +25,7 @@
   },
   {
     "name": "Blackhole Jet",
-    "description": "Charges up to 2s, then fires a 15m black hole beam that deals 4 hits of damage."
+    "description": "Creates a black hole at the enemy's location for 11s, continuously pulling in hostile units within 17m and dealing 208.30% SP.ATK DMG every 1.2s. Consumes 500 Psi Energy."
   },
   {
     "name": "Blade Declaration",
@@ -117,7 +117,7 @@
   },
   {
     "name": "Flame Jet",
-    "description": "Shoots flames about 10 meters forward, dealing continuous damage to enemies in the path."
+    "description": "Sprays flames forward, dealing SP.ATK DMG to enemies in the path every 0.5s."
   },
   {
     "name": "Flaming Flight",
@@ -165,7 +165,7 @@
   },
   {
     "name": "Ice Crystal Barrage",
-    "description": "Summons several Ice Crystals that, after a short delay, fire at a single target, dealing high multi-hit Elemental DMG."
+    "description": "Summons 6 ice crystals in succession, which launch after a brief delay, each dealing SP.ATK DMG in a 4m radius."
   },
   {
     "name": "Incendiary Bullet",
@@ -233,7 +233,7 @@
   },
   {
     "name": "Pulse Ray",
-    "description": "Continuously emits an elemental beam at the target, dealing DMG every 0.05s to enemies in its path. Lasts 5s."
+    "description": "Shoots an elemental beam at the target, dealing SP.ATK DMG to enemies in its path every 0.5s."
   },
   {
     "name": "Rain Arrow",
@@ -329,6 +329,6 @@
   },
   {
     "name": "Wild Shot",
-    "description": "Unleashes a barrage of shots in front, dealing multiple instances of Physical DMG to targets in range."
+    "description": "Performs 6 consecutive ranged strafes, each dealing P.ATK DMG."
   }
 ]
