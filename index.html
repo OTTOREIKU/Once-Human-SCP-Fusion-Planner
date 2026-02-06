@@ -27,6 +27,43 @@
     </div>
 </div>
 
+<div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 400px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;">
+            <h3 style="margin:0; color:white;">View Settings</h3>
+            <span class="close-modal" onclick="toggleSettingsModal()">✕</span>
+        </div>
+        <div class="settings-list">
+            <label class="setting-item">
+                <div style="display:flex; flex-direction:column;">
+                    <span>Show Slot Data</span>
+                    <span style="font-size:0.75rem; color:#888; font-style:italic; margin-top:2px;">Slot data is a work in progress and may not be accurate</span>
+                </div>
+                <input type="checkbox" id="chkSlotData" onchange="toggleGlobalSetting('SLOT')">
+            </label>
+            
+            <div style="height:1px; background:#333; margin:10px 0;"></div>
+            
+            <label class="setting-item">
+                <span>Show Custom Build Planner</span>
+                <input type="checkbox" id="chkBuilder" onchange="toggleGlobalSetting('BUILDER')" checked>
+            </label>
+            <label class="setting-item">
+                <span>Show Isolation Checker</span>
+                <input type="checkbox" id="chkIsolation" onchange="toggleGlobalSetting('ISOLATION')" checked>
+            </label>
+            <label class="setting-item">
+                <span>Show Technique Search</span>
+                <input type="checkbox" id="chkTechSearch" onchange="toggleGlobalSetting('TECH_SEARCH')" checked>
+            </label>
+            <label class="setting-item">
+                <span>Show Deviation Search</span>
+                <input type="checkbox" id="chkDevSearch" onchange="toggleGlobalSetting('DEV_SEARCH')" checked>
+            </label>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     
     <h1 style="text-align:center; color:white; margin-bottom: 20px;">
@@ -40,6 +77,13 @@
         
         <div style="display:flex; gap:10px; align-items:center;">
             <button class="btn-sq" onclick="openDataModal()" title="Database Info">i</button>
+            
+            <button class="btn-sq" onclick="toggleSettingsModal()" title="Module Settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+
             <a href="https://github.com/OTTOREIKU/Once-Human-SCP-Fusion-Planner" target="_blank" class="btn-link btn-sq" style="padding:0;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
             </a>
@@ -88,7 +132,7 @@
                 <button class="filter-btn" onclick="applyFilter('Furniture', this)">Furniture</button>
                 <button class="filter-btn" onclick="applyFilter('Variation', this)">Variations</button>
                 
-                <span style="color:#555; font-size:1.2rem; margin:0 5px; user-select:none; font-weight:300;">|</span>
+                <span id="slotFilterSep" style="color:#555; font-size:1.2rem; margin:0 5px; user-select:none; font-weight:300;">|</span>
 
                 <button class="filter-btn slot-btn active" onclick="applySlotFilter('All', this)">Slots</button>
                 <button class="filter-btn slot-btn" onclick="applySlotFilter(1, this)">1</button>
@@ -107,7 +151,7 @@
         </div>
     </div>
 
-    <div class="tool-panel" style="border-top-color: #ffffff;">
+    <div id="panel-builder" class="tool-panel" style="border-top-color: #ffffff;">
         <h3>Custom Build Planner</h3>
         
         <div style="margin-bottom: 20px;">
@@ -159,7 +203,7 @@
         </div>
     </div>
 
-    <div class="tool-panel">
+    <div id="panel-isolation" class="tool-panel">
         <h3>Technique Isolation Checker</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr auto auto; gap:10px; align-items:end;">
             <div>
@@ -176,7 +220,7 @@
         <div id="results-area" class="grid-cols"></div>
     </div>
 
-    <div class="tool-panel">
+    <div id="panel-tech-search" class="tool-panel">
         <h3>Technique Search</h3>
         <div style="display:flex; gap:10px;">
             <select id="searchTechniqueSelect"><option>Loading...</option></select>
@@ -187,7 +231,7 @@
         <div id="technique-results-area" class="grid-cols"></div>
     </div>
 
-    <div class="tool-panel">
+    <div id="panel-dev-search" class="tool-panel">
         <h3>Deviation Search</h3>
         <div style="display:flex; gap:10px; margin-bottom:10px;">
             <input type="text" id="deviantSearchInput" placeholder="Search name..." onkeyup="filterDeviants()">
@@ -219,7 +263,7 @@
     </div>
     
     <div style="text-align:center; margin-top: 40px; color: #666; font-size: 0.8rem;">
-        OTTOREIKU | V1.03
+        OTTOREIKU | V1.04
     </div>
 </div>
 
@@ -235,4 +279,3 @@ document.addEventListener('click', function(e) {
 
 </body>
 </html>
-

@@ -1,7 +1,11 @@
 /* =========================================
-   CONFIGURATION
+   DYNAMIC CONFIGURATION (Defaults)
    ========================================= */
-const SHOW_SLOT_DATA = false; // Set to false to hide all Slot (S1, S2...) UI elements
+let SHOW_SLOT_DATA = false;
+let SHOW_BUILDER_MODULE = true;
+let SHOW_ISOLATION_MODULE = true;
+let SHOW_TECH_SEARCH_MODULE = true;
+let SHOW_DEV_SEARCH_MODULE = true;
 /* ========================================= */
 
 let deviations = [];
@@ -24,6 +28,55 @@ const builderDevSelect = document.getElementById('builderDevSelect');
 const techniqueSelect = document.getElementById('targetTechnique');
 const searchTechniqueSelect = document.getElementById('searchTechniqueSelect');
 const tooltip = document.getElementById('technique-tooltip');
+
+/* === SETTINGS LOGIC === */
+function toggleSettingsModal() {
+    document.getElementById('settingsModal').classList.toggle('hidden');
+}
+
+function toggleGlobalSetting(type) {
+    // 1. Update Boolean
+    if (type === 'SLOT') SHOW_SLOT_DATA = document.getElementById('chkSlotData').checked;
+    if (type === 'BUILDER') SHOW_BUILDER_MODULE = document.getElementById('chkBuilder').checked;
+    if (type === 'ISOLATION') SHOW_ISOLATION_MODULE = document.getElementById('chkIsolation').checked;
+    if (type === 'TECH_SEARCH') SHOW_TECH_SEARCH_MODULE = document.getElementById('chkTechSearch').checked;
+    if (type === 'DEV_SEARCH') SHOW_DEV_SEARCH_MODULE = document.getElementById('chkDevSearch').checked;
+
+    // 2. Apply Visibility Changes
+    applyVisibilitySettings();
+}
+
+function applyVisibilitySettings() {
+    // A. Toggle Panels
+    toggleDisplay('panel-builder', SHOW_BUILDER_MODULE);
+    toggleDisplay('panel-isolation', SHOW_ISOLATION_MODULE);
+    toggleDisplay('panel-tech-search', SHOW_TECH_SEARCH_MODULE);
+    toggleDisplay('panel-dev-search', SHOW_DEV_SEARCH_MODULE);
+
+    // B. Toggle Slot Data UI elements
+    const slotBtns = document.querySelectorAll('.slot-btn');
+    const separator = document.getElementById('slotFilterSep');
+    
+    if (SHOW_SLOT_DATA) {
+        slotBtns.forEach(btn => btn.style.display = '');
+        if(separator) separator.style.display = '';
+    } else {
+        slotBtns.forEach(btn => btn.style.display = 'none');
+        if(separator) separator.style.display = 'none';
+    }
+
+    // C. Re-render components that rely on Slot Data text
+    buildTraitsTable();   // Redraws the Trait Library table
+    generatePlan();       // Redraws the Planner results (to add/remove warnings)
+    renderSelectedTraits(); // Redraws selected traits in builder
+}
+
+function toggleDisplay(id, shouldShow) {
+    const el = document.getElementById(id);
+    if(el) el.style.display = shouldShow ? 'block' : 'none';
+}
+/* ====================== */
+
 
 function safeTooltip(str) {
     if (!str) return "No description";
@@ -72,6 +125,7 @@ async function init() {
         populateUI();
         renderDeviants(); 
         auditData(); 
+        applyVisibilitySettings(); // Ensure defaults are applied on load
     } catch (error) {
         console.error("Error loading data:", error);
     }
@@ -97,7 +151,7 @@ function filterTraitDropdown() {
             const div = document.createElement('div');
             div.className = 'trait-option';
             
-            // TOGGLE: Only show slot text if enabled
+            // DYNAMIC: Only show slot text if enabled
             const slotStr = (SHOW_SLOT_DATA && t.slot) ? ` [S${t.slot}]` : '';
             
             div.innerHTML = `${t.name} <span>[${t.source}]${slotStr}</span>`;
@@ -218,8 +272,56 @@ function updateComparison() {
     `;
 }
 
-function auditData() { const techDefinitions = new Set(techniquesData.map(t => t.name)); deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) console.warn(`Missing definition: "${tech}"`); }); }); }
-function openDataModal() { const modal = document.getElementById('dataSyncModal'); const statusDiv = document.getElementById('dataSyncStatus'); modal.classList.remove('hidden'); const techDefinitions = new Set(techniquesData.map(t => t.name)); let missingTechCount = 0; let html = ""; deviations.forEach(dev => { dev.techniques.forEach(tech => { if (!techDefinitions.has(tech)) { missingTechCount++; html += `<div style="font-size:0.85rem; padding:4px 0; border-bottom:1px dotted #333;"><span style="color:var(--danger)">MISSING:</span> ${tech} (${dev.name})</div>`; } }); }); let missingPsi = 0; let missingPassive = 0; deviations.forEach(dev => { if (!dev.psi || dev.psi === "Data needed") missingPsi++; if (!dev.passive || dev.passive === "Data needed") missingPassive++; }); statusDiv.innerHTML = missingTechCount === 0 ? `<h4 style="color:var(--success);">✅ Core Data Synced Successfully!</h4>` : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; statusDiv.innerHTML += `<div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;"><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div><div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div><div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;"><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div><div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div></div></div>`; }
+function auditData() { 
+    const techDefinitions = new Set(techniquesData.map(t => t.name)); 
+    let missingTechCount = 0; 
+    let html = ""; 
+
+    deviations.forEach(dev => { 
+        dev.techniques.forEach(tech => { 
+            if (!techDefinitions.has(tech)) { 
+                missingTechCount++; 
+                html += `<div style="font-size:0.85rem; padding:4px 0; border-bottom:1px dotted #333;"><span style="color:var(--danger)">MISSING:</span> ${tech} (${dev.name})</div>`; 
+            } 
+        }); 
+    }); 
+
+    let missingPsi = 0; 
+    let missingPassive = 0; 
+    let missingStandard = 0;
+
+    deviations.forEach(dev => { 
+        if (!dev.psi || dev.psi === "Data needed") missingPsi++; 
+        if (!dev.passive || dev.passive === "Data needed") missingPassive++; 
+        // NEW: Check for Standard
+        if (!dev.standard || dev.standard === "Data needed") missingStandard++;
+    }); 
+
+    const statusDiv = document.getElementById('dataSyncStatus');
+    
+    statusDiv.innerHTML = missingTechCount === 0 
+        ? `<h4 style="color:var(--success);">Core Data Synced Successfully!</h4>` 
+        : `<h4 style="color:var(--danger);">${missingTechCount} Issues Found</h4>${html}`; 
+    
+    // UPDATED: Added Standard Data Missing Stats
+    statusDiv.innerHTML += `
+    <div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.85rem; color: #ccc;">
+        <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Deviations:</span> <strong>${deviations.length}</strong></div>
+        <div style="display:flex; justify-content: space-between; margin-bottom:4px;"><span>Total Techniques:</span> <strong>${techniquesData.length}</strong></div>
+        <div style="display:flex; justify-content: space-between; margin-bottom:10px;"><span>Total Traits:</span> <strong>${traits.length}</strong></div>
+        <div style="border-top:1px dotted #444; margin-top:5px; padding-top:5px;">
+            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>PSI Data Missing:</span> <strong>${missingPsi} / ${deviations.length}</strong></div>
+            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Passive Data Missing:</span> <strong>${missingPassive} / ${deviations.length}</strong></div>
+            <div style="display:flex; justify-content: space-between; color:#ffb74d;"><span>Standard Data Missing:</span> <strong>${missingStandard} / ${deviations.length}</strong></div>
+        </div>
+    </div>`; 
+}
+
+function openDataModal() { 
+    document.getElementById('dataSyncModal').classList.remove('hidden'); 
+    auditData(); // Re-run audit when opening to ensure stats are fresh
+}
+
 function closeDataModal() { document.getElementById('dataSyncModal').classList.add('hidden'); }
 
 function populateUI() {
@@ -242,7 +344,7 @@ function populateUI() {
     sourceSelect.onchange = updateTechniques; builderDevSelect.onchange = updateBuilderTechniques;
     updateTechniques(); updateBuilderTechniques();
 
-    // TOGGLE: Hide Slot UI buttons if disabled
+    // CONFIG: Hide Slot UI buttons if disabled
     if (!SHOW_SLOT_DATA) {
         document.querySelectorAll('.slot-btn').forEach(btn => btn.style.display = 'none');
         // Hide the separator text "|" if found before the buttons
@@ -251,6 +353,18 @@ function populateUI() {
             const separator = slotBtns[0].previousElementSibling;
             if(separator && separator.tagName === 'SPAN' && separator.innerHTML.includes('|')) {
                 separator.style.display = 'none';
+            }
+        }
+    }
+
+    // CONFIG: Hide Builder Module if disabled
+    if (!SHOW_BUILDER_MODULE) {
+        const headers = document.querySelectorAll('h3');
+        for (const h3 of headers) {
+            if (h3.textContent.trim() === "Custom Build Planner") {
+                 const panel = h3.closest('.tool-panel');
+                 if(panel) panel.style.display = 'none';
+                 break;
             }
         }
     }
@@ -275,7 +389,7 @@ function buildTraitsTable() {
     const sortedTraits = [...traits].sort((a, b) => a.name.localeCompare(b.name));
 
     tbody.innerHTML = sortedTraits.map(t => {
-        // TOGGLE: Only show badge if enabled
+        // DYNAMIC: Only show badge if enabled
         let slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge float-right">S${t.slot}</span>` : '';
 
         return `
@@ -357,8 +471,13 @@ function renderDeviants() {
             let passDesc = dev.passive || "Data needed";
             if(passDesc.includes(':')) passDesc = passDesc.split(/:(.*)/s)[1].trim();
             
+            // NEW: Standard Data Handling
+            let stdDesc = dev.standard || "Data needed";
+            if(stdDesc.includes(':')) stdDesc = stdDesc.split(/:(.*)/s)[1].trim();
+
             const psiStr = (dev.psi && dev.psi !== "Data needed") ? dev.psi.split(':')[0] : "-";
             const passStr = (dev.passive && dev.passive !== "Data needed") ? dev.passive.split(':')[0] : "-";
+            const stdStr = (dev.standard && dev.standard !== "Data needed") ? dev.standard.split(':')[0] : "-";
 
             container.innerHTML += `
                 <div class="uni-card ${status}">
@@ -372,6 +491,10 @@ function renderDeviants() {
                     <div class="card-body">
                         <div style="margin-bottom:4px; cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(psiDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">PSI:</strong> ${psiStr}</div>
                         <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(passDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Passive:</strong> ${passStr}</div>
+                        
+                        <div style="height:1px; background:#3e3e42; margin:6px 0; border-top:1px dashed #555;"></div>
+                        
+                        <div style="cursor:help;" onmouseenter="showTooltip(event, '${safeTooltip(stdDesc)}')" onmouseleave="hideTooltip()"><strong style="color:#aaa;">Standard:</strong> ${stdStr}</div>
                     </div>
                 </div>`;
         }
@@ -439,7 +562,7 @@ function renderSelectedTraits() {
     const container = document.getElementById('selectedTraits');
     container.innerHTML = "";
     userSelectedTraits.forEach((t, idx) => {
-        // TOGGLE: Only show badge if enabled
+        // DYNAMIC: Only show badge if enabled
         const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge mini">S${t.slot}</span>` : '';
 
         container.innerHTML += `
@@ -555,11 +678,11 @@ function generatePlan() {
         });
 
         userSelectedTraits.forEach(t => {
-            // TOGGLE: Only show badge if enabled
+            // DYNAMIC: Only show badge if enabled
             const slotBadge = (SHOW_SLOT_DATA && t.slot) ? `<span class="slot-badge">S${t.slot}</span>` : '';
             
             let warningBadge = '';
-            // TOGGLE: Only calculate warnings if enabled
+            // DYNAMIC: Only calculate warnings if enabled
             if (SHOW_SLOT_DATA && t.slot && slotCounts[t.slot] > 1) {
                 warningBadge = `<span class="warning-badge" onmouseenter="showTooltip(event, 'Warning: Duplicate Slot ${t.slot}')" onmouseleave="hideTooltip()">!</span>`;
             }
@@ -646,4 +769,3 @@ function generateShareCode() {
 }
 
 init();
-
