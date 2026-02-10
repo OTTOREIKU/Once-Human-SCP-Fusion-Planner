@@ -39,7 +39,7 @@
       {"name": "Pyro Dino", "type": "Species Code", "cost": 120},
       {"name": "Strange Door", "type": "Species Code", "cost": 120},
       {"name": "Mini Wonder", "type": "Species Code", "cost": 120},
-      {"name": "Chefosaurus Rex", "type": "Species Code", "cost": 120},
+      {"name": "Chefosaurus Rex", "type": "Species Code", "cost": 240},
       {"name": "Flame Bullet", "type": "Skill Mutagen", "cost": 20},
       {"name": "Healing Bullet", "type": "Skill Mutagen", "cost": 20},
       {"name": "Lightning Pierce", "type": "Skill Mutagen", "cost": 40},
@@ -128,5 +128,6 @@
     ]
   }
 ]
+
 
 
